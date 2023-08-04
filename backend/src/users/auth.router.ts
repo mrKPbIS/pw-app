@@ -1,13 +1,11 @@
 import { Router } from 'express';
-import jwt from 'jsonwebtoken';
 import { UserRepository } from './user.repository';
-import config from '../config';
+import { createToken } from '../common/token';
 
-const auth = Router();
+const authRouter = Router();
 const userRepository = new UserRepository();
-const secret = config.JWT_SECRET;
 
-auth.post('/register', async (req, res) => {
+authRouter.post('/register', async (req, res) => {
   const { email, name, password } = req.body;
   let user = await userRepository.findByEmail(email);
   if (user) {
@@ -17,7 +15,7 @@ auth.post('/register', async (req, res) => {
   }
   try {
     user = await userRepository.createUser({ email, name, rawPassword: password });
-    const token = jwt.sign({ id: user.id, email: user.email }, secret);
+    const token = createToken({ id: user.id, email: user.email });
     return res.send({
       success: true,
       token,
@@ -27,7 +25,7 @@ auth.post('/register', async (req, res) => {
   }
 });
 
-auth.post('/login', async (req, res) => {
+authRouter.post('/login', async (req, res) => {
   const { email, password } = req.body;
   const user = await userRepository.findByEmail(email);
   if (!user || !userRepository.confirmPassword(user, password)) {
@@ -35,11 +33,11 @@ auth.post('/login', async (req, res) => {
       success: false,
     });
   }
-  const token = jwt.sign({ id: user.id, email: user.email }, secret);
+  const token = createToken({ id: user.id, email: user.email });
   return res.send({
     success: true,
     token,
   });
 });
 
-export default auth;
+export default authRouter;

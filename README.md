@@ -10,10 +10,12 @@ Backend TODO:
 1. ~~Create models to interact with DB (typeorm)~~
 1. ~~Create db driver~~
 1. ~~Create auth endpoints (jsonwebtoken)~~
-1. Create user profile endpoints
-1. Create transaction endpoints
+1. ~~Create user profile endpoints~~
+1. ~~Create transaction endpoints~~
 1. Add errors handling and input validation
+1. Add indexes
 1. Add tests
+1. Fix TODO's
 
 Frontend TODO:
 1. Create react app
@@ -38,6 +40,9 @@ response:
   "error": {
     "code": "number",
     "message": "string"
+  },
+  "data": {
+    "token": "string"
   }
 }
 ```
@@ -60,25 +65,17 @@ response
   "error": {
     "code": "number",
     "message": "string"
+  },
+  "data": {
+    "token": "string"
   }
 }
 ```
 
+### Create transaction
+method: `POST` url: `/api/transactions`
 
-logout 
-auth: Bearer token
-```json
-{
-  "success": "boolean",
-  "auth_token": "string",
-  "error": {
-    "code": "number",
-    "message": "string"
-  }
-}
-```
-
-create transaction
+request:
 auth: Bearer token
 ```json
 {
@@ -87,6 +84,7 @@ auth: Bearer token
 }
 ```
 
+response:
 ```json
 {
   "success": "boolean",
@@ -96,18 +94,20 @@ auth: Bearer token
   },
   "data": {
     "id": "string",
-    "sender": "string",
-    "recipient": "string",
-    "createdAt": "string",
-    "amount": "string",
-    "amountAfter": "string"
+    "amountAfter": "string",
+    "createdAt": "string"
   }
 }
 ```
 
-get transactions
+### Get transactions list for authorized user
+Method: `GET` url: `api/transactions?offset=0&limit=0`
+
+request:
+
 auth: Bearer token
-url: /api/transactions?offset=0&limit=0
+
+response:
 ```json
 {
   "success": "true",
@@ -118,8 +118,8 @@ url: /api/transactions?offset=0&limit=0
   "data": [
     {
       "id": "string",
-      "sender": "string",
-      "recipient": "string",
+      "senderId": "string",
+      "recipientId": "string",
       "createdAt": "string",
       "amount": "string",
       "amountAfter": "string"
@@ -128,10 +128,14 @@ url: /api/transactions?offset=0&limit=0
 }
 ```
 
-get transaction details
-auth: Bearer token
-url: /api/transactions/:transactionId
+### Get transaction details for authorized user
+Method: `GET` url: `/api/transactions/:id`
 
+request:
+
+auth: Bearer token
+
+response:
 ```json
 {
   "success": "true",
@@ -142,8 +146,8 @@ url: /api/transactions/:transactionId
   "data": [
     {
       "id": "string",
-      "sender": "string",
-      "recipient": "string",
+      "senderId": "string",
+      "recipientId": "string",
       "amount": "string",
       "amountAfter": "string",
       "createdAt": "string"
@@ -152,10 +156,14 @@ url: /api/transactions/:transactionId
 }
 ```
 
-get user profile
-auth: Bearer token
-url: /api/users/profile
+### Get authorized user profile
+Method: `GET` url: `/api/users/profile`
 
+request:
+
+auth: Bearer token
+
+response:
 ```json
 {
   "success": "true",
@@ -172,9 +180,14 @@ url: /api/users/profile
 }
 ```
 
-get users list
+### get users list
+Method: `GET` url: `/api/users?name=text&offset=0&limit=0`
+
+request:
+
 auth: Bearer token
-url: /api/users?filter=text&offset=0&limit=0
+
+response:
 ```json
 {
   "success": "true",
@@ -186,7 +199,6 @@ url: /api/users?filter=text&offset=0&limit=0
     "id": "string",
     "name": "string",
     "email": "string",
-    "balance": "string"
   }]
 }
 ```
@@ -195,15 +207,15 @@ url: /api/users?filter=text&offset=0&limit=0
 
 ### User
 - id: integer, autoincrement, PK, not null
-- name: varchar(100), not null
-- email: varchar(500?), not null
+- name: varchar(100), not null, index
+- email: varchar(500?), not null, index
 - password: varchar(100), not null
 - balance: varchar(15), not null
 - createdAt: timestamp
 
 ### Transaction
 - id: uuid, PK, not null
-- owner: number, FK(user), not null
+- owner: number, FK(user), not null, index
 - recipient: number, FK(user), not null
 - amount: varchar(15), not null
 - amountAfter: varchar(15), not null

@@ -33,7 +33,6 @@ export class User {
   @Column({
     type: 'varchar',
     length: 15,
-    default: 0,
     nullable: false,
   })
     balance: string;
