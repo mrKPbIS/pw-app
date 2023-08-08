@@ -1,3 +1,5 @@
+import { InternalError } from '../middleware/errors.middleware';
+
 export const DEFAULT_STARTING_BALANCE = '500.00';
 
 const DECIMAL_UNITS_COUNT = 2;
@@ -13,7 +15,7 @@ export function compareBalance(balance: string, amount: string): boolean {
 export function substractBalance(balance: string, amount: string): string {
   const balanceVal = stringToInt(balance), amountVal = stringToInt(amount);
   if (Number.isNaN(balanceVal) || Number.isNaN(amountVal)) {
-    throw new Error('unable to calculate');
+    throw new InternalError('unable to calculate');
   }
 
   return intToString(balanceVal - amountVal);
@@ -22,7 +24,7 @@ export function substractBalance(balance: string, amount: string): string {
 export function incrementBalance(balance: string, amount: string): string {
   const balanceVal = stringToInt(balance), amountVal = stringToInt(amount);
   if (Number.isNaN(balanceVal) || Number.isNaN(amountVal)) {
-    throw new Error('unable to calculate');
+    throw new InternalError('unable to calculate');
   }
 
   return intToString(balanceVal + amountVal);

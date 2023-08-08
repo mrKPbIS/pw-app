@@ -1,16 +1,15 @@
 import { Router } from 'express';
+import { NotFoundError } from '../middleware/errors.middleware';
 import { authorizationMiddleware, AuthorizedRequestInterface } from '../middleware/authorization.middleware';
 import { TransactionRepository } from './transaction.repository';
 
 // TODO: validate requests fields. Create interfaces
 const transactionRouter = Router();
-
 const transactionRepository = new TransactionRepository();
-
 
 transactionRouter.use(authorizationMiddleware);
 
-transactionRouter.post('/', async (req: AuthorizedRequestInterface, res) => {
+transactionRouter.post('/', async (req: AuthorizedRequestInterface, res, next) => {
   const { recepient, amount } = req.body;
   const sender = req.user;
   try {
@@ -23,33 +22,41 @@ transactionRouter.post('/', async (req: AuthorizedRequestInterface, res) => {
       success: true,
     });
   } catch (err) {
-    res.sendStatus(500);
+    next(err);
   }
 });
 
-transactionRouter.get('/', async (req: AuthorizedRequestInterface, res) => {
+transactionRouter.get('/', async (req: AuthorizedRequestInterface, res, next) => {
   const limit = typeof req.query['limit'] === 'string'? Number(req.query['limit']): 0;
   const offset = typeof req.query['offset'] === 'string'? Number(req.query['offset']): 0;
-  const [transactions, count] = await transactionRepository.findTransactions(req.user, { limit, offset });
-  res.send({
-    success: true,
-    data: {
-      transactions,
-      count,
-    },
-  });
-});
-
-transactionRouter.get('/:id', async (req: AuthorizedRequestInterface, res) => {
-  const { id } = req.params;
-  const transaction = await transactionRepository.findById(id);
-  if (!transaction) {
-    res.sendStatus(404);
-  } else {
+  try {
+    const [transactions, count] = await transactionRepository.findTransactions(req.user, { limit, offset });
     res.send({
       success: true,
-      data: transaction,
+      data: {
+        transactions,
+        count,
+      },
     });
+  } catch (err) {
+    next(err);
+  }
+});
+
+transactionRouter.get('/:id', async (req: AuthorizedRequestInterface, res, next) => {
+  const { id } = req.params;
+  try {
+    const transaction = await transactionRepository.findById(id);
+    if (!transaction) {
+      throw new NotFoundError('Transaction not found');
+    } else {
+      res.send({
+        success: true,
+        data: transaction,
+      });
+    }
+  } catch (err) {
+    next(err);
   }
 });
 

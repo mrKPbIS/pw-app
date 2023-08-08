@@ -17,7 +17,7 @@ export class TransactionRepository {
     this.repository = (await getDataSource()).getRepository(Transaction);
   }
 
-  async findById(id: string) {
+  async findById(id: string): Promise<Transaction | null> {
     return this.repository.findOneBy({ id });
   }
 
@@ -35,7 +35,7 @@ export class TransactionRepository {
     });
   }
 
-  async createTransaction(transactionCreateData: TransactionCreateData) {
+  async createTransaction(transactionCreateData: TransactionCreateData): Promise<void> {
     const manager = this.repository.manager;
     await manager.transaction('READ UNCOMMITTED',
       async (entityManager) => {
@@ -55,7 +55,7 @@ export class TransactionRepository {
           amountAfter: senderBalance,
         });
         await entityManager.save(transaction);
-      });
+      }
+    );
   }
-
 }

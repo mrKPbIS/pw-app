@@ -1,43 +1,44 @@
 import { Router } from 'express';
 import { UserRepository } from './user.repository';
 import { createToken } from '../common/token';
+import { BadRequestError, ForbiddenRequestError } from '../middleware/errors.middleware';
 
 const authRouter = Router();
 const userRepository = new UserRepository();
 
-authRouter.post('/register', async (req, res) => {
+authRouter.post('/register', async (req, res, next) => {
   const { email, name, password } = req.body;
-  let user = await userRepository.findByEmail(email);
-  if (user) {
-    return res.send({
-      success: false,
-    });
-  }
   try {
+    let user = await userRepository.findByEmail(email);
+    if (user) {
+      throw new ForbiddenRequestError('User already registered');
+    }
     user = await userRepository.createUser({ email, name, rawPassword: password });
     const token = createToken({ id: user.id, email: user.email });
     return res.send({
       success: true,
-      token,
+      data: token,
     });
   } catch (err) {
-    console.log(err);
+    next(err);
   }
 });
 
-authRouter.post('/login', async (req, res) => {
+authRouter.post('/login', async (req, res, next) => {
   const { email, password } = req.body;
-  const user = await userRepository.findByEmail(email);
-  if (!user || !userRepository.confirmPassword(user, password)) {
+  try {
+    const user = await userRepository.findByEmail(email);
+    if (!user || !userRepository.confirmPassword(user, password)) {
+      throw new BadRequestError('Password does not match');
+    }
+    const token = createToken({ id: user.id, email: user.email });
     return res.send({
-      success: false,
+      success: true,
+      data: token,
     });
+  } catch (err) {
+    next(err);
   }
-  const token = createToken({ id: user.id, email: user.email });
-  return res.send({
-    success: true,
-    token,
-  });
 });
 
 export default authRouter;

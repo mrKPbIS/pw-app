@@ -9,19 +9,23 @@ const userRepository = new UserRepository();
 userRouter.use(authorizationMiddleware);
 
 // TODO: reduce fields in response
-userRouter.get('/', async (req, res) => {
+userRouter.get('/', async (req, res, next) => {
   const limit = typeof req.query['limit'] === 'string'? Number(req.query['limit']): 0;
   const offset = typeof req.query['offset'] === 'string'? Number(req.query['offset']): 0;
   const name = typeof req.query['name'] === 'string'? req.query['name']: '';
 
-  const [users, count] = await userRepository.findUsers({ limit, offset, name });
-  return res.send({
-    success: true,
-    data: {
-      users,
-      count,
-    },
-  });
+  try {
+    const [users, count] = await userRepository.findUsers({ limit, offset, name });
+    return res.send({
+      success: true,
+      data: {
+        users,
+        count,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
 });
 
 // TODO: reduce fields in response

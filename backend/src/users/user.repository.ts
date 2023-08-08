@@ -29,7 +29,6 @@ export class UserRepository {
   }
 
   async findUsers(searchParams: UserSearchParams): Promise<[User[], number]> {
-    console.log(searchParams);
     const { name, limit, offset } = searchParams;
     return await this.repository.findAndCount({
       where: {
