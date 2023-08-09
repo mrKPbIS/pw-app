@@ -1,14 +1,37 @@
 import { Router } from 'express';
+import { checkSchema, validationResult } from 'express-validator';
 import { UserRepository } from './user.repository';
 import { createToken } from '../common/token';
-import { BadRequestError, ForbiddenRequestError } from '../middleware/errors.middleware';
+import { BadRequestError, ForbiddenRequestError, ValidationError } from '../middleware/errors.middleware';
 
 const authRouter = Router();
 const userRepository = new UserRepository();
 
-authRouter.post('/register', async (req, res, next) => {
-  const { email, name, password } = req.body;
+authRouter.post('/register', checkSchema({
+  email: {
+    isEmail: true,
+    errorMessage: 'should be email',
+  },
+  password: {
+    isString: true,
+    isLength: {
+      errorMessage: 'should be a string with length not less than 6',
+      options: {
+        min:6,
+      }
+    },
+  },
+  name: {
+    isString: true,
+    errorMessage: 'should be a string',
+  }
+}, ['body']), async (req, res, next) => {
   try {
+    const validation = validationResult(req);
+    if (!validation.isEmpty()) {
+      throw new ValidationError(validation);
+    }
+    const { email, name, password } = req.body;
     let user = await userRepository.findByEmail(email);
     if (user) {
       throw new ForbiddenRequestError('User already registered');
@@ -24,9 +47,27 @@ authRouter.post('/register', async (req, res, next) => {
   }
 });
 
-authRouter.post('/login', async (req, res, next) => {
-  const { email, password } = req.body;
+authRouter.post('/login', checkSchema({
+  email: {
+    isEmail: true,
+    errorMessage: 'should be email',
+  },
+  password: {
+    isString: true,
+    isLength: {
+      errorMessage: 'should be a string with length not less than 6',
+      options: {
+        min:6,
+      }
+    },
+  },
+}, ['body']), async (req, res, next) => {
   try {
+    const validation = validationResult(req);
+    if (!validation.isEmpty()) {
+      throw new ValidationError(validation);
+    }
+    const { email, password } = req.body;
     const user = await userRepository.findByEmail(email);
     if (!user || !userRepository.confirmPassword(user, password)) {
       throw new BadRequestError('Password does not match');

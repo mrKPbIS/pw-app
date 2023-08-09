@@ -27,7 +27,7 @@ export async function authorizationMiddleware(req, res, next) {
       if (!user) {
         throw new ForbiddenRequestError('User not found');
       }
-      console.log(req.user);
+      req.user = user;
       next();
     }
   } catch (err) {

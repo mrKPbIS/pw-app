@@ -1,18 +1,43 @@
 import { Router } from 'express';
-import { NotFoundError } from '../middleware/errors.middleware';
+import { checkSchema, validationResult } from 'express-validator';
+import { ForbiddenRequestError, NotFoundError, ValidationError } from '../middleware/errors.middleware';
 import { authorizationMiddleware, AuthorizedRequestInterface } from '../middleware/authorization.middleware';
 import { TransactionRepository } from './transaction.repository';
 
-// TODO: validate requests fields. Create interfaces
 const transactionRouter = Router();
 const transactionRepository = new TransactionRepository();
 
 transactionRouter.use(authorizationMiddleware);
 
-transactionRouter.post('/', async (req: AuthorizedRequestInterface, res, next) => {
-  const { recepient, amount } = req.body;
-  const sender = req.user;
+transactionRouter.post('/', checkSchema({
+  recepient: {
+    isNumeric: true,
+    toInt: true,
+    errorMessage: 'should be Int',
+  },
+  amount: {
+    isString: true,
+    isNumeric: true,
+    errorMessage: 'should be decimal with 2 decimal digits',
+    isDecimal: {
+      options: {
+        decimal_digits: '2',
+      }
+    }
+  }
+}, ['body']), async (req: AuthorizedRequestInterface, res, next) => {
   try {
+    const validation = validationResult(req);
+    if (!validation.isEmpty()) {
+      throw new ValidationError(validation);
+    }
+    const { recepient, amount } = req.body;
+    const sender = req.user;
+
+    if (sender.id === recepient) {
+      throw new ForbiddenRequestError('Not allowed to transfer to self');
+    }
+
     await transactionRepository.createTransaction({
       amount,
       recipientId: recepient,
@@ -26,10 +51,20 @@ transactionRouter.post('/', async (req: AuthorizedRequestInterface, res, next) =
   }
 });
 
-transactionRouter.get('/', async (req: AuthorizedRequestInterface, res, next) => {
-  const limit = typeof req.query['limit'] === 'string'? Number(req.query['limit']): 0;
-  const offset = typeof req.query['offset'] === 'string'? Number(req.query['offset']): 0;
+transactionRouter.get('/', checkSchema({
+  limit: {
+    customSanitizer: {
+      options: value => typeof value === 'string' && !Number.isNaN(Number(value))? Number(value): 0,
+    },
+  },
+  offset: {
+    customSanitizer: {
+      options: value => typeof value === 'string' && !Number.isNaN(Number(value))? Number(value): 0,
+    },
+  },
+}, ['query']), async (req: AuthorizedRequestInterface, res, next) => {
   try {
+    const { limit, offset } = req.query;
     const [transactions, count] = await transactionRepository.findTransactions(req.user, { limit, offset });
     res.send({
       success: true,
@@ -43,7 +78,13 @@ transactionRouter.get('/', async (req: AuthorizedRequestInterface, res, next) =>
   }
 });
 
-transactionRouter.get('/:id', async (req: AuthorizedRequestInterface, res, next) => {
+transactionRouter.get('/:id', checkSchema({
+  id: {
+    isNumeric: true,
+    toInt: true,
+    errorMessage: 'should be Int',
+  }
+}, ['params']), async (req: AuthorizedRequestInterface, res, next) => {
   const { id } = req.params;
   try {
     const transaction = await transactionRepository.findById(id);

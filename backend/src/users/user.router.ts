@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { checkSchema, validationResult } from 'express-validator';
 import { UserRepository } from './user.repository';
 import { authorizationMiddleware, AuthorizedRequestInterface } from '../middleware/authorization.middleware';
 
@@ -9,12 +10,28 @@ const userRepository = new UserRepository();
 userRouter.use(authorizationMiddleware);
 
 // TODO: reduce fields in response
-userRouter.get('/', async (req, res, next) => {
-  const limit = typeof req.query['limit'] === 'string'? Number(req.query['limit']): 0;
-  const offset = typeof req.query['offset'] === 'string'? Number(req.query['offset']): 0;
-  const name = typeof req.query['name'] === 'string'? req.query['name']: '';
+userRouter.get('/', checkSchema({
+  limit: {
+    isNumeric: true,
+    customSanitizer: {
+      options: value => typeof value === 'string' && !Number.isNaN(Number(value))? Number(value): 0,
+    },
+  },
+  offset: {
+    customSanitizer: {
+      options: value => typeof value === 'string' && !Number.isNaN(Number(value))? Number(value): 0,
+    },
+  },
+  name: {
+    default: {
+      options: '',
+    },
+    isString: true,
+  }
+}, ['query']), async (req, res, next) => {
 
   try {
+    const { limit, offset, name } = req.query;
     const [users, count] = await userRepository.findUsers({ limit, offset, name });
     return res.send({
       success: true,
