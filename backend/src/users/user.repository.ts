@@ -1,9 +1,9 @@
-import { User } from '../entity/user';
-import { getDataSource } from '../adapters/dataSource';
 import { Like, Repository } from 'typeorm';
 import { hash, compare } from 'bcryptjs';
-import { UserCreateData, UserSearchParams } from './interfaces/user.interfaces';
+import { initDataSource } from '../adapters/dataSource';
+import { User } from '../entity/user';
 import { DEFAULT_STARTING_BALANCE } from '../common/balance';
+import { UserCreateData, UserSearchParams } from './interfaces/user.interfaces';
 
 export class UserRepository {
   private repository: Repository<User>;
@@ -12,8 +12,8 @@ export class UserRepository {
   }
 
   async init() {
+    this.repository = (await initDataSource()).getRepository(User);
     console.log('User repository initialized');
-    this.repository = (await getDataSource()).getRepository(User);
   }
 
   async findById(id: number): Promise<User | null> {

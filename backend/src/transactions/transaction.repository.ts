@@ -1,6 +1,6 @@
 import { User } from '../entity/user';
 import { Repository } from 'typeorm';
-import { getDataSource } from '../adapters/dataSource';
+import { initDataSource } from '../adapters/dataSource';
 import { Transaction } from '../entity/transaction';
 import { TransactionCreateData, TransctionSearchParams } from './interfaces/transaction.interfaces';
 import { compareBalance, incrementBalance, substractBalance } from '../common/balance';
@@ -13,8 +13,8 @@ export class TransactionRepository {
 
   // TODO: fix multiple inits
   async init() {
+    this.repository = (await initDataSource()).getRepository(Transaction);
     console.log('Transaction repository initialized');
-    this.repository = (await getDataSource()).getRepository(Transaction);
   }
 
   async findById(id: string): Promise<Transaction | null> {

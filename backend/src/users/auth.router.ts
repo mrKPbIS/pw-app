@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import { checkSchema, validationResult } from 'express-validator';
-import { UserRepository } from './user.repository';
 import { createToken } from '../common/token';
 import { BadRequestError, ForbiddenRequestError, ValidationError } from '../middleware/errors.middleware';
+import { UserRepository } from './user.repository';
 
 const authRouter = Router();
 const userRepository = new UserRepository();

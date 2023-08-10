@@ -1,4 +1,10 @@
+import { initDataSource } from './adapters/dataSource';
 import app from './app';
 import config from './config';
 
-app.listen(config.APP_PORT);
+async function bootstrap() {
+  await initDataSource();
+  app.listen(config.APP_PORT);
+}
+
+bootstrap();

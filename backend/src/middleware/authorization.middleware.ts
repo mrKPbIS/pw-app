@@ -5,8 +5,8 @@ import { ForbiddenRequestError, UnauthorizedRequestError } from './errors.middle
 
 const userRepository = new UserRepository();
 
-// TODO: remove any
 //  move interface to separated file
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface AuthorizedRequestInterface extends Record<string, any> {
   user?: User,
 }

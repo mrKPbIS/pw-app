@@ -1,11 +1,10 @@
 import { Router } from 'express';
-import { checkSchema, validationResult } from 'express-validator';
-import { UserRepository } from './user.repository';
+import { checkSchema } from 'express-validator';
 import { authorizationMiddleware, AuthorizedRequestInterface } from '../middleware/authorization.middleware';
+import { UserRepository } from './user.repository';
 
 const userRouter = Router();
 const userRepository = new UserRepository();
-
 
 userRouter.use(authorizationMiddleware);
 
