@@ -1,14 +1,16 @@
 import { Router } from 'express';
 import { checkSchema } from 'express-validator';
+import { plainToClass } from 'class-transformer';
 import { authorizationMiddleware, AuthorizedRequestInterface } from '../middleware/authorization.middleware';
+import { GetUsersResponse } from './dto/getUsersResponse.dto';
 import { UserRepository } from './user.repository';
+import { GetUsersProfileResponse } from './dto/getUsersProfileResponse.dto';
 
 const userRouter = Router();
 const userRepository = new UserRepository();
 
 userRouter.use(authorizationMiddleware);
 
-// TODO: reduce fields in response
 userRouter.get('/', checkSchema({
   limit: {
     isNumeric: true,
@@ -35,7 +37,7 @@ userRouter.get('/', checkSchema({
     return res.send({
       success: true,
       data: {
-        users,
+        users: users.map(user => plainToClass(GetUsersResponse, user, { excludeExtraneousValues: true })),
         count,
       },
     });
@@ -44,12 +46,11 @@ userRouter.get('/', checkSchema({
   }
 });
 
-// TODO: reduce fields in response
 userRouter.get('/profile', async (req: AuthorizedRequestInterface, res) => {
   const user = req.user;
   return res.send({
     success: true,
-    data: user,
+    data: plainToClass(GetUsersProfileResponse, user, { excludeExtraneousValues: true }),
   });
 });
 

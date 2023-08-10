@@ -14,7 +14,7 @@ Backend TODO:
 1. ~~Create transaction endpoints~~
 1. ~~Add errors handling~~
 1. ~~Add input validation~~
-1. Add indexes
+1. ~~Add indexes~~
 1. Add tests
 1. Fix TODO's
 

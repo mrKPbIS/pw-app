@@ -1,4 +1,4 @@
-import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
+import { Column, Entity, Index, OneToMany, PrimaryColumn } from 'typeorm';
 import { Transaction } from './transaction';
 
 @Entity({ name: 'Users' })
@@ -9,6 +9,7 @@ export class User {
   })
     id: number;
 
+  @Index()
   @Column({
     type: 'varchar',
     length: 100,
@@ -16,6 +17,7 @@ export class User {
   })
     name: string;
 
+  @Index({ unique: true })
   @Column({
     type: 'varchar',
     length: 500,
@@ -39,6 +41,7 @@ export class User {
 
   @Column({
     type: 'timestamp',
+    name: 'created_at',
   })
     createdAt: Date;
 

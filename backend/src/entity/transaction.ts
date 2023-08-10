@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm';
+import { Column, Entity, Index, ManyToOne, PrimaryColumn } from 'typeorm';
 import { User } from './user';
 
 @Entity({ name: 'Transactions' })
@@ -9,13 +9,17 @@ export class Transaction {
   })
     id: string;
 
+  @Index()
   @Column({
     type: 'integer',
+    name: 'owner_id',
   })
     ownerId: number;
 
+  @Index()
   @Column({
     type: 'integer',
+    name: 'recepient_id',
   })
     recepientId: number;
 
@@ -28,11 +32,13 @@ export class Transaction {
   @Column({
     type: 'varchar',
     length: 15,
+    name: 'amount_after',
   })
     amountAfter: string;
 
   @Column({
     type: 'timestamp',
+    name: 'created_at',
   })
     createdAt: Date;
 

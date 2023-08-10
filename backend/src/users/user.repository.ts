@@ -11,6 +11,7 @@ export class UserRepository {
     this.init();
   }
 
+  // TODO: fix multiple inits
   async init() {
     this.repository = (await initDataSource()).getRepository(User);
     console.log('User repository initialized');
