@@ -11,7 +11,6 @@ export class TransactionRepository {
     this.init();
   }
 
-  // TODO: fix multiple inits
   async init() {
     this.repository = (await initDataSource()).getRepository(Transaction);
     console.log('Transaction repository initialized');
@@ -40,17 +39,17 @@ export class TransactionRepository {
     await manager.transaction('READ UNCOMMITTED',
       async (entityManager) => {
         const sender = await entityManager.findOneBy(User, { id: transactionCreateData.senderId });
-        const recepient = await entityManager.findOneBy(User, { id: transactionCreateData.recipientId });
-        if (!sender || !recepient || !compareBalance(sender.balance, transactionCreateData.amount)) {
+        const recipient = await entityManager.findOneBy(User, { id: transactionCreateData.recipientId });
+        if (!sender || !recipient || !compareBalance(sender.balance, transactionCreateData.amount)) {
           throw new Error('unable to create transaction');
         }
         const senderBalance = substractBalance(sender.balance, transactionCreateData.amount);
-        const recepientBalance = incrementBalance(recepient.balance, transactionCreateData.amount);
+        const recipientBalance = incrementBalance(recipient.balance, transactionCreateData.amount);
         await entityManager.update(User, { id: sender.id }, { balance: senderBalance });
-        await entityManager.update(User, { id: recepient.id }, { balance: recepientBalance });
+        await entityManager.update(User, { id: recipient.id }, { balance: recipientBalance });
         const transaction = entityManager.create(Transaction, {
           ownerId: sender.id,
-          recepientId: recepient.id,
+          recipientId: recipient.id,
           amount: transactionCreateData.amount,
           amountAfter: senderBalance,
         });

@@ -10,7 +10,7 @@ const transactionRepository = new TransactionRepository();
 transactionRouter.use(authorizationMiddleware);
 
 transactionRouter.post('/', checkSchema({
-  recepient: {
+  recipient: {
     isNumeric: true,
     toInt: true,
     errorMessage: 'should be Int',
@@ -31,16 +31,16 @@ transactionRouter.post('/', checkSchema({
     if (!validation.isEmpty()) {
       throw new ValidationError(validation);
     }
-    const { recepient, amount } = req.body;
+    const { recipient, amount } = req.body;
     const sender = req.user;
 
-    if (sender.id === recepient) {
+    if (sender.id === recipient) {
       throw new ForbiddenRequestError('Not allowed to transfer to self');
     }
 
     await transactionRepository.createTransaction({
       amount,
-      recipientId: recepient,
+      recipientId: recipient,
       senderId: sender.id,
     });
     res.send({

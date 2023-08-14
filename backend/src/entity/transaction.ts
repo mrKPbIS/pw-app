@@ -19,9 +19,9 @@ export class Transaction {
   @Index()
   @Column({
     type: 'integer',
-    name: 'recepient_id',
+    name: 'recipient_id',
   })
-    recepientId: number;
+    recipientId: number;
 
   @Column({
     type: 'varchar',

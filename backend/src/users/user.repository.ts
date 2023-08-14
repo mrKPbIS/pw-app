@@ -52,6 +52,6 @@ export class UserRepository {
   }
 
   async confirmPassword(user: User, password: string): Promise<boolean>  {
-    return await compare(user.password, await (hash(password, 10)));
+    return compare(password, user.password);
   }
 }

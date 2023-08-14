@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { checkSchema, validationResult } from 'express-validator';
 import { createToken } from '../common/token';
-import { BadRequestError, ForbiddenRequestError, ValidationError } from '../middleware/errors.middleware';
+import { BadRequestError, ForbiddenRequestError, NotFoundError, ValidationError } from '../middleware/errors.middleware';
 import { UserRepository } from './user.repository';
 
 const authRouter = Router();
@@ -69,7 +69,10 @@ authRouter.post('/login', checkSchema({
     }
     const { email, password } = req.body;
     const user = await userRepository.findByEmail(email);
-    if (!user || !userRepository.confirmPassword(user, password)) {
+    if (!user) {
+      throw new NotFoundError('User not found');
+    }
+    if (!(await userRepository.confirmPassword(user, password))) {
       throw new BadRequestError('Password does not match');
     }
     const token = createToken({ id: user.id, email: user.email });

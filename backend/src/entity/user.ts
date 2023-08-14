@@ -48,6 +48,6 @@ export class User {
   @OneToMany(() => Transaction, (transaction) => transaction.ownerId)
     ownTransactions: Transaction[];
 
-  @OneToMany(() => Transaction, (transaction) => transaction.recepientId)
+  @OneToMany(() => Transaction, (transaction) => transaction.recipientId)
     recievedTransactions: Transaction[];
 }
