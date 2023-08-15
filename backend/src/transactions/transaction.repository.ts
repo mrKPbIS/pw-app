@@ -30,14 +30,18 @@ export class TransactionRepository {
       order: {
         id: 'ASC',
       },
+      relations: {
+        owner: true,
+        recipient: true,
+      },
       skip: offset,
       take: limit,
     });
   }
 
-  async createTransaction(transactionCreateData: TransactionCreateData): Promise<void> {
+  async createTransaction(transactionCreateData: TransactionCreateData): Promise<Transaction> {
     const manager = this.repository.manager;
-    await manager.transaction('READ UNCOMMITTED',
+    return await manager.transaction('READ UNCOMMITTED',
       async (entityManager) => {
         const sender = await entityManager.findOneBy(User, { id: transactionCreateData.senderId });
         const recipient = await entityManager.findOneBy(User, { id: transactionCreateData.recipientId });
@@ -57,7 +61,7 @@ export class TransactionRepository {
           amount: transactionCreateData.amount,
           amountAfter: senderBalance,
         });
-        await entityManager.save(transaction);
+        return await entityManager.save(transaction);
       }
     );
   }

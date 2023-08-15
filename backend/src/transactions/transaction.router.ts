@@ -10,7 +10,7 @@ const transactionRepository = new TransactionRepository();
 transactionRouter.use(authorizationMiddleware);
 
 transactionRouter.post('/', checkSchema({
-  recipient: {
+  recipientId: {
     isNumeric: true,
     toInt: true,
     errorMessage: 'should be Int',
@@ -31,20 +31,21 @@ transactionRouter.post('/', checkSchema({
     if (!validation.isEmpty()) {
       throw new ValidationError(validation);
     }
-    const { recipient, amount } = req.body;
+    const { recipientId, amount } = req.body;
     const sender = req.user;
 
-    if (sender.id === recipient) {
+    if (sender.id === recipientId) {
       throw new ForbiddenRequestError('Not allowed to transfer to self');
     }
 
-    await transactionRepository.createTransaction({
+    const transaction = await transactionRepository.createTransaction({
       amount,
-      recipientId: recipient,
+      recipientId,
       senderId: sender.id,
     });
     res.send({
       success: true,
+      data: transaction,
     });
   } catch (err) {
     next(err);
@@ -66,6 +67,7 @@ transactionRouter.get('/', checkSchema({
   try {
     const { limit, offset } = req.query;
     const [transactions, count] = await transactionRepository.findTransactions(req.user, { limit, offset });
+    // TODO: limit User fields with DTO
     res.send({
       success: true,
       data: {
@@ -91,6 +93,7 @@ transactionRouter.get('/:id', checkSchema({
     if (!transaction) {
       throw new NotFoundError('Transaction not found');
     } else {
+      // TODO: limit User fields with DTO
       res.send({
         success: true,
         data: transaction,

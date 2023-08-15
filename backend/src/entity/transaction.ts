@@ -12,14 +12,12 @@ export class Transaction {
   @Index()
   @Column({
     type: 'integer',
-    name: 'owner_id',
   })
     ownerId: number;
 
   @Index()
   @Column({
     type: 'integer',
-    name: 'recipient_id',
   })
     recipientId: number;
 

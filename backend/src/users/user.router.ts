@@ -5,6 +5,7 @@ import { authorizationMiddleware, AuthorizedRequestInterface } from '../middlewa
 import { GetUsersResponse } from './dto/getUsersResponse.dto';
 import { UserRepository } from './user.repository';
 import { GetUsersProfileResponse } from './dto/getUsersProfileResponse.dto';
+import { NotFoundError } from '../middleware/errors.middleware';
 
 const userRouter = Router();
 const userRepository = new UserRepository();
@@ -41,6 +42,29 @@ userRouter.get('/', checkSchema({
         count,
       },
     });
+  } catch (err) {
+    next(err);
+  }
+});
+
+userRouter.get('/:id', checkSchema({
+  id: {
+    isNumeric: true,
+    toInt: true,
+    errorMessage: 'should be Int',
+  }
+}, ['params']), async (req: AuthorizedRequestInterface, res, next) => {
+  const { id } = req.params;
+  try {
+    const user = await userRepository.findById(id);
+    if (!user) {
+      throw new NotFoundError('Transaction not found');
+    } else {
+      res.send({
+        success: true,
+        data: plainToClass(GetUsersProfileResponse, user, { excludeExtraneousValues: true }),
+      });
+    }
   } catch (err) {
     next(err);
   }
