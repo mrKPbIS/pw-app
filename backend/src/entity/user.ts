@@ -40,8 +40,9 @@ export class User {
     balance: string;
 
   @Column({
-    type: 'timestamp',
+    type: 'datetime',
     name: 'created_at',
+    default: () => 'GETDATE()',
   })
     createdAt: Date;
 

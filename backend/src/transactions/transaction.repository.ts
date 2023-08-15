@@ -4,7 +4,7 @@ import { initDataSource } from '../adapters/dataSource';
 import { Transaction } from '../entity/transaction';
 import { TransactionCreateData, TransctionSearchParams } from './interfaces/transaction.interfaces';
 import { compareBalance, incrementBalance, substractBalance } from '../common/balance';
-import { BadRequestError } from 'src/middleware/errors.middleware';
+import { BadRequestError } from '../middleware/errors.middleware';
 
 export class TransactionRepository {
   private repository: Repository<Transaction>;

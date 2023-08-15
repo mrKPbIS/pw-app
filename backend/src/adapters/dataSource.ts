@@ -29,7 +29,8 @@ export async function initDataSource() {
         entities: [User, Transaction],
         extra: {
           trustServerCertificate: true,
-        }
+        },
+        logging: true,
       });
       dataSource = await AppDataSource.initialize();
       console.log('Data source initialized');
