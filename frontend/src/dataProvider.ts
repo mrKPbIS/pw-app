@@ -1,6 +1,5 @@
 import { DataProvider, HttpError } from "react-admin";
-import { API_BASE_URL } from "./constants";
-import { makeRequest, get, post } from "./transport";
+import { get, post } from "./transport";
 
 export const dataProvider: DataProvider = {
   getList: async (entity, options) => {
@@ -17,23 +16,21 @@ export const dataProvider: DataProvider = {
     if (!success) {
       throw new HttpError(error.message, error.code, { message: error.message});
     }
-
     // TODO: return actual data
-    return data;
+    console.log('GET ONE ', entity);
+    return {data};
   },
   
   getMany: () => Promise.reject('Not implemented'),
   getManyReference: () => Promise.reject('Not implemented'),
 
   create: async (entity, { data }) => {
-    const r = await post(entity, localStorage.getItem('auth'), data);
+    const r = await post(entity, localStorage.getItem('auth'), JSON.stringify(data));
     const { success, error, data: responseData } = await r.json();
     if (!success) {
       throw new HttpError(error.message, error.code, { message: error.message});
     }
-
-    // TODO: debug
-    return responseData;
+    return { data: responseData };
   },
 
   update: () => Promise.reject('Not implemented'),

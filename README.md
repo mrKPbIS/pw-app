@@ -19,7 +19,15 @@ Backend TODO:
 1. Fix TODO's
 
 Frontend TODO:
-1. Create react app
+1. ~~Create react app~~
+1. ~~Create profile page~~
+1. ~~Create transactions list~~
+1. ~~Create login page~~
+1. ~~Transaction create page~~
+1. Add search by name to transaction create
+1. Add validation to transaction create
+1. Add transaction duplicate
+
 
 ## Current problems
 

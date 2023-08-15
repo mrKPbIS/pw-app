@@ -11,8 +11,9 @@ export const authProvider: AuthProvider = {
     if (!success) {
       throw new HttpError(error.message, error.code, { message: error.message});
     }
-    console.log(jwtDecode(data));
+    const tokenData = jwtDecode<{ id: string, email: string }>(data);
     localStorage.setItem('auth', data);
+    localStorage.setItem('user', JSON.stringify(tokenData));
     return { redirectTo: '/'};
     
   },
@@ -45,17 +46,21 @@ export const authProvider: AuthProvider = {
     return Promise.resolve(undefined);
   },
   getIdentity: () => {
-    const token = localStorage.getItem('auth');
-    if (!token) {
-      return Promise.reject();
+    let user = localStorage.getItem('user');
+    if (user) {
+      return Promise.resolve(JSON.parse(user));
+    } else {
+      const token = localStorage.getItem('auth');
+      if (!token) {
+        return Promise.reject();
+      }
+      const tokenData = jwtDecode<{ id: string, email: string }>(token);
+      if (!tokenData) {
+        return Promise.reject();
+      }
+      const { id, email } = tokenData;
+      return Promise.resolve({ id, email });
     }
-    const tokenData = jwtDecode<{ id: string, email: string }>(token);
-    if (!tokenData) {
-      return Promise.reject();
-    }
-    const { id, email } = tokenData;
-    console.log(id, email);
-    return Promise.resolve({ id, email });
   },
 };
 
