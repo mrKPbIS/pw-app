@@ -4,6 +4,7 @@ import { initDataSource } from '../adapters/dataSource';
 import { Transaction } from '../entity/transaction';
 import { TransactionCreateData, TransctionSearchParams } from './interfaces/transaction.interfaces';
 import { compareBalance, incrementBalance, substractBalance } from '../common/balance';
+import { BadRequestError } from 'src/middleware/errors.middleware';
 
 export class TransactionRepository {
   private repository: Repository<Transaction>;
@@ -40,8 +41,11 @@ export class TransactionRepository {
       async (entityManager) => {
         const sender = await entityManager.findOneBy(User, { id: transactionCreateData.senderId });
         const recipient = await entityManager.findOneBy(User, { id: transactionCreateData.recipientId });
-        if (!sender || !recipient || !compareBalance(sender.balance, transactionCreateData.amount)) {
-          throw new Error('unable to create transaction');
+        if (!sender || !recipient) {
+          throw new BadRequestError('Unable to find user');
+        }
+        if (!compareBalance(sender.balance, transactionCreateData.amount)) {
+          throw new BadRequestError('Incorrect amount value');
         }
         const senderBalance = substractBalance(sender.balance, transactionCreateData.amount);
         const recipientBalance = incrementBalance(recipient.balance, transactionCreateData.amount);

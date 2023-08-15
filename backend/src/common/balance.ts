@@ -6,10 +6,10 @@ const DECIMAL_UNITS_COUNT = 2;
 
 export function compareBalance(balance: string, amount: string): boolean {
   const balanceVal = stringToInt(balance), amountVal = stringToInt(amount);
-  if (Number.isNaN(balanceVal) || Number.isNaN(amountVal)) {
+  if (Number.isNaN(balanceVal) || Number.isNaN(amountVal) || amountVal < 0) {
     return false;
   }
-  return balance >= amount;
+  return balanceVal >= amountVal;
 }
 
 export function substractBalance(balance: string, amount: string): string {
