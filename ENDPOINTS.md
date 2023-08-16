@@ -17,9 +17,7 @@ response:
     "code": "number",
     "message": "string"
   },
-  "data": {
-    "token": "string"
-  }
+  "data": "string"
 }
 ```
 
@@ -42,9 +40,7 @@ response
     "code": "number",
     "message": "string"
   },
-  "data": {
-    "token": "string"
-  }
+  "data": "string"
 }
 ```
 
@@ -55,7 +51,7 @@ request:
 auth: Bearer token
 ```json
 {
-  "recipient": "string",
+  "recipientId": "number",
   "amount": "string",
 }
 ```
@@ -70,6 +66,17 @@ response:
   },
   "data": {
     "id": "string",
+    "recipientId": "number",
+    "recipient": {
+      "id": "number",
+      "name": "string"
+    },
+    "ownerId": "number",
+    "owner": {
+      "id": "number",
+      "name": "string"
+    },
+    "amount": "string",
     "amountAfter": "string",
     "createdAt": "string"
   }
@@ -91,16 +98,27 @@ response:
     "code": "number",
     "message": "string"
   },
-  "data": [
-    {
-      "id": "string",
-      "senderId": "string",
-      "recipientId": "string",
-      "createdAt": "string",
-      "amount": "string",
-      "amountAfter": "string"
-    }
-  ]
+  "data": {
+    "transactions": [
+      {
+        "id": "string",
+        "recipientId": "number",
+        "recipient": {
+          "id": "number",
+          "name": "string"
+        },
+        "ownerId": "number",
+        "owner": {
+          "id": "number",
+          "name": "string"
+        },
+        "amount": "string",
+        "amountAfter": "string",
+        "createdAt": "string"
+      }
+    ],
+    "count": "number"
+  }
 }
 ```
 
@@ -119,21 +137,51 @@ response:
     "code": "number",
     "message": "string"
   },
-  "data": [
-    {
-      "id": "string",
-      "senderId": "string",
-      "recipientId": "string",
-      "amount": "string",
-      "amountAfter": "string",
-      "createdAt": "string"
-    }
-  ]
+  "data": {
+    "id": "string",
+    "recipientId": "number",
+    "recipient": {
+      "id": "number",
+      "name": "string"
+    },
+    "ownerId": "number",
+    "owner": {
+      "id": "number",
+      "name": "string"
+    },
+    "amount": "string",
+    "amountAfter": "string",
+    "createdAt": "string"
+  }
 }
 ```
 
 ### Get authorized user profile
 Method: `GET` url: `/api/users/profile`
+
+request:
+
+auth: Bearer token
+
+response:
+```json
+{
+  "success": "true",
+  "error": {
+    "code": "number",
+    "message": "string"
+  },
+  "data": {
+    "id": "string",
+    "name": "string",
+    "email": "string",
+    "balance": "string"
+  }
+}
+```
+
+### Get user details by id
+Method: `GET` url: `/api/users/:id`
 
 request:
 
@@ -171,10 +219,15 @@ response:
     "code": "number",
     "message": "string"
   },
-  "data": [{
-    "id": "string",
-    "name": "string",
-    "email": "string",
-  }]
+  "data": {
+    "users": [
+     {
+      "id": "string",
+      "name": "string",
+      "email": "string",
+      }
+    ],
+    "count": "number"
+  }
 }
 ```

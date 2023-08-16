@@ -44,15 +44,15 @@ Frontend TODO:
 ### User
 - id: integer, autoincrement, PK, not null
 - name: varchar(100), not null, index
-- email: varchar(500?), not null, index
-- password: varchar(100), not null
+- email: varchar(500), not null, index
+- password: varchar(64), not null
 - balance: varchar(15), not null
-- createdAt: timestamp
+- created_at: datetime
 
 ### Transaction
 - id: uuid, PK, not null
-- owner: number, FK(user), not null, index
-- recipient: number, FK(user), not null
+- ownerId: number, FK(user), not null
+- recipientId: number, FK(user), not null, index
 - amount: varchar(15), not null
 - amountAfter: varchar(15), not null
-- createdAt: timestamp
+- created_at: datetime
