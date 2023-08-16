@@ -18,7 +18,13 @@ export class TransactionRepository {
   }
 
   async findById(id: string): Promise<Transaction | null> {
-    return this.repository.findOneBy({ id });
+    return this.repository.findOne({
+      where: { id },
+      relations: {
+        owner: true,
+        recipient: true,
+      },
+    });
   }
 
   async findTransactions(user: User, searchParams: TransctionSearchParams): Promise<[Transaction[], number]> {

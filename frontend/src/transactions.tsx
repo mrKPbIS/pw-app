@@ -1,11 +1,15 @@
 import React from "react";
 import {
   AutocompleteInput,
+  CloneButton,
   Create,
   Datagrid,
   List,
   ReferenceInput,
+  Show,
+  ShowButton,
   SimpleForm,
+  SimpleShowLayout,
   TextField,
   TextInput,
   useAuthenticated,
@@ -16,12 +20,28 @@ export const TransactionsList = () => {
   return (
     <List>
       <Datagrid>
+        <ShowButton />
         <TextField source="amount" />
         <TextField source="recipient.name" />
         <TextField source="amountAfter" />
         <TextField source="createdAt" />
       </Datagrid>
     </List>
+  );
+};
+
+export const TransactionShow = () => {
+  useAuthenticated();
+  return (
+    <Show actions={<CloneButton />}>
+      <SimpleShowLayout>
+        <TextField source="id" />
+        <TextField source="amount" />
+        <TextField source="recipient.name" />
+        <TextField source="amountAfter" />
+        <TextField source="createdAt" />
+      </SimpleShowLayout>
+    </Show>
   );
 };
 

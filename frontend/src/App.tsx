@@ -1,5 +1,10 @@
 import React from "react";
-import { Admin, Authenticated, CustomRoutes, Resource } from "react-admin";
+import {
+  Admin,
+  Authenticated,
+  CustomRoutes,
+  Resource,
+} from "react-admin";
 
 import { Route } from "react-router-dom";
 
@@ -9,7 +14,11 @@ import { dataProvider } from "./dataProvider";
 import { CustomLayout } from "./Menu";
 import { UserProfile } from "./Profile";
 import { RegistrationForm } from "./Registration";
-import { TransactionCreate, TransactionsList } from "./transactions";
+import {
+  TransactionCreate,
+  TransactionShow,
+  TransactionsList,
+} from "./transactions";
 import { LoginForm } from "./Login";
 
 export const App = () => (
@@ -39,6 +48,7 @@ export const App = () => (
       name="transactions"
       create={TransactionCreate}
       list={TransactionsList}
+      show={TransactionShow}
     />
   </Admin>
 );

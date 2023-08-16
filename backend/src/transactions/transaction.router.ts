@@ -83,9 +83,8 @@ transactionRouter.get('/', checkSchema({
 
 transactionRouter.get('/:id', checkSchema({
   id: {
-    isNumeric: true,
-    toInt: true,
-    errorMessage: 'should be Int',
+    isUUID: true,
+    errorMessage: 'should be UUID',
   }
 }, ['params']), async (req: AuthorizedRequestInterface, res, next) => {
   const { id } = req.params;

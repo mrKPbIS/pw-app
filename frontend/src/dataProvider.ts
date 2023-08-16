@@ -35,8 +35,21 @@ export const dataProvider: DataProvider = {
     return { data };
   },
 
-  getMany: () => Promise.reject("Not implemented"),
-  getManyReference: () => Promise.reject("Not implemented"),
+  getMany: async (entity, options) => {
+    console.log(options);
+    const r = await get(
+      `${entity}/${options.ids[0]}`,
+      localStorage.getItem("auth"),
+    );
+    const { success, error, data } = await r.json();
+    if (!success) {
+      throw new HttpError(error.message, error.code, {
+        message: error.message,
+      });
+    }
+    return { data: [data] };
+  },
+  getManyReference: () => Promise.reject("getManyReference not implemented"),
 
   create: async (entity, { data }) => {
     const r = await post(
@@ -53,9 +66,9 @@ export const dataProvider: DataProvider = {
     return { data: responseData };
   },
 
-  update: () => Promise.reject("Not implemented"),
-  updateMany: () => Promise.reject("Not implemented"),
+  update: () => Promise.reject("update not implemented"),
+  updateMany: () => Promise.reject("updateMany not implemented"),
 
-  delete: () => Promise.reject("Not implemented"),
-  deleteMany: () => Promise.reject("Not implemented"),
+  delete: () => Promise.reject("delete not implemented"),
+  deleteMany: () => Promise.reject("deleteMany not implemented"),
 };
