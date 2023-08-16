@@ -25,6 +25,7 @@ export async function initDataSource() {
         username: config.DB_USERNAME,
         password: config.DB_PASSWORD,
         database: config.DB_NAME,
+        // TODO: app crashes if synchronize set true and DB already exists
         synchronize: false,
         entities: [User, Transaction],
         extra: {

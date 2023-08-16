@@ -21,6 +21,7 @@ transactionRouter.post('/', checkSchema({
     errorMessage: 'should be decimal with 2 decimal digits',
     isDecimal: {
       options: {
+        force_decimal: true,
         decimal_digits: '2',
       }
     }

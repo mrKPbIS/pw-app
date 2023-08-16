@@ -32,7 +32,7 @@ export function incrementBalance(balance: string, amount: string): string {
 
 export function stringToInt(value: string): number {
   const [whole, fraction] = value.split('.');
-  if (fraction.length !== DECIMAL_UNITS_COUNT) {
+  if (!fraction || fraction.length !== DECIMAL_UNITS_COUNT) {
     return NaN;
   }
   return Number(whole + fraction);

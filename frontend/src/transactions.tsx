@@ -16,9 +16,8 @@ export const TransactionsList = () => {
   return (
     <List>
       <Datagrid>
-        <TextField source="id" />
-        <TextField source="recipientId" />
         <TextField source="amount" />
+        <TextField source="recipient.name" />
         <TextField source="amountAfter" />
         <TextField source="createdAt" />
       </Datagrid>
