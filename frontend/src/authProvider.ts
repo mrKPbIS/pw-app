@@ -1,21 +1,50 @@
 import { AuthProvider, HttpError } from "react-admin";
-import jwtDecode from 'jwt-decode';
+import jwtDecode from "jwt-decode";
 import { API_BASE_URL } from "./constants";
 import { post } from "./transport";
 
-export const authProvider: AuthProvider = {
-  login: async ({ username: email, password }) => {
+export type CustomAuthProvider = AuthProvider & {
+  register: (params: any) => Promise<any>;
+};
 
-    const r = await post('auth/login', null, JSON.stringify({ email, password }))
+export const authProvider: CustomAuthProvider = {
+  register: async ({ email, name, password, checkPassword }) => {
+    if (password !== checkPassword) {
+      throw new Error("password dont match");
+    }
+
+    const r = await post(
+      "auth/register",
+      null,
+      JSON.stringify({ email, password, name }),
+    );
     const { success, error, data } = await r.json();
     if (!success) {
-      throw new HttpError(error.message, error.code, { message: error.message});
+      throw new HttpError(error.message, error.code, {
+        message: error.message,
+      });
     }
-    const tokenData = jwtDecode<{ id: string, email: string }>(data);
-    localStorage.setItem('auth', data);
-    localStorage.setItem('user', JSON.stringify(tokenData));
-    return { redirectTo: '/'};
-    
+    const tokenData = jwtDecode<{ id: string; email: string }>(data);
+    localStorage.setItem("auth", data);
+    localStorage.setItem("user", JSON.stringify(tokenData));
+    return { redirectTo: "/" };
+  },
+  login: async ({ email, password }) => {
+    const r = await post(
+      "auth/login",
+      null,
+      JSON.stringify({ email, password }),
+    );
+    const { success, error, data } = await r.json();
+    if (!success) {
+      throw new HttpError(error.message, error.code, {
+        message: error.message,
+      });
+    }
+    const tokenData = jwtDecode<{ id: string; email: string }>(data);
+    localStorage.setItem("auth", data);
+    localStorage.setItem("user", JSON.stringify(tokenData));
+    return { redirectTo: "/" };
   },
   logout: () => {
     localStorage.removeItem("auth");
@@ -23,13 +52,13 @@ export const authProvider: AuthProvider = {
   },
   checkError: (error) => {
     if (error.code === 401 || error.code === 403) {
-      localStorage.removeItem('auth');
+      localStorage.removeItem("auth");
       return Promise.reject();
     }
     return Promise.resolve();
   },
   checkAuth: () => {
-    const token = localStorage.getItem('auth');
+    const token = localStorage.getItem("auth");
     if (!token) {
       return Promise.reject();
     }
@@ -46,15 +75,15 @@ export const authProvider: AuthProvider = {
     return Promise.resolve(undefined);
   },
   getIdentity: () => {
-    let user = localStorage.getItem('user');
+    let user = localStorage.getItem("user");
     if (user) {
       return Promise.resolve(JSON.parse(user));
     } else {
-      const token = localStorage.getItem('auth');
+      const token = localStorage.getItem("auth");
       if (!token) {
         return Promise.reject();
       }
-      const tokenData = jwtDecode<{ id: string, email: string }>(token);
+      const tokenData = jwtDecode<{ id: string; email: string }>(token);
       if (!tokenData) {
         return Promise.reject();
       }
