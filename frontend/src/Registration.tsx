@@ -1,12 +1,7 @@
 import * as React from "react";
 import { styled } from "@mui/material/styles";
 import { Button, CardContent, CircularProgress } from "@mui/material";
-import {
-  required,
-  useTranslate,
-  useNotify,
-  useSafeSetState,
-} from "ra-core";
+import { required, useTranslate, useNotify, useSafeSetState } from "ra-core";
 import { TextInput, Form, useAuthProvider } from "react-admin";
 import { CustomAuthProvider } from "./authProvider";
 import { useNavigate } from "react-router-dom";

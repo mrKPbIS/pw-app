@@ -25,7 +25,7 @@ Frontend TODO:
 1. ~~Create login page~~
 1. ~~Transaction create page~~
 1. ~~Create registration page~~
-1. Add search by name to transaction create
+1. ~~Add search by name to transaction create~~
 1. Add validation to transaction create
 1. Add transaction duplicate
 
@@ -33,7 +33,8 @@ Frontend TODO:
 ## Current problems
 
 1. [Duplicate initiation of entity repositories](backend/src/users/user.repository.ts#14)
-2. [Wrong timestamp value in DB](backend/src/entity/transaction.ts#53)
+1. [App crashes with dataSource synchronization](backend/src/adapters/dataSource.ts#28)
+1. [Login page renders in upper left corner](frontend/src/App.tsx)
 
 [Endpoints description](ENDPOINTS.md)
 

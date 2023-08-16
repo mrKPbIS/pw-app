@@ -1,7 +1,14 @@
 import * as React from "react";
 import { styled, ThemeProvider } from "@mui/material/styles";
 import PropTypes from "prop-types";
-import { Button, CardContent, CircularProgress, CssBaseline, Paper, ScopedCssBaseline } from "@mui/material";
+import {
+  Button,
+  CardContent,
+  CircularProgress,
+  CssBaseline,
+  Paper,
+  ScopedCssBaseline,
+} from "@mui/material";
 import {
   required,
   useTranslate,
@@ -56,71 +63,71 @@ export const LoginForm = (props: LoginFormProps) => {
   };
 
   return (
-      <Paper>
-        <StyledForm
-          onSubmit={submit}
-          mode="onChange"
-          noValidate
-          className={className}
-        >
-          <CardContent className={LoginFormClasses.content}>
-            <TextInput
-              autoFocus
-              source="username"
-              label={translate("ra.auth.username")}
-              autoComplete="username"
-              validate={required()}
-              fullWidth
-            />
-            <TextInput
-              source="password"
-              label={translate("ra.auth.password")}
-              type="password"
-              autoComplete="current-password"
-              validate={required()}
-              fullWidth
-            />
+    <Paper>
+      <StyledForm
+        onSubmit={submit}
+        mode="onChange"
+        noValidate
+        className={className}
+      >
+        <CardContent className={LoginFormClasses.content}>
+          <TextInput
+            autoFocus
+            source="username"
+            label={translate("ra.auth.username")}
+            autoComplete="username"
+            validate={required()}
+            fullWidth
+          />
+          <TextInput
+            source="password"
+            label={translate("ra.auth.password")}
+            type="password"
+            autoComplete="current-password"
+            validate={required()}
+            fullWidth
+          />
 
-            <Button
-              variant="contained"
-              type="submit"
-              color="primary"
-              disabled={loading}
-              fullWidth
-              className={LoginFormClasses.button}
-            >
-              {loading ? (
-                <CircularProgress
-                  className={LoginFormClasses.icon}
-                  size={19}
-                  thickness={3}
-                />
-              ) : (
-                translate("ra.auth.sign_in")
-              )}
-            </Button>
-            <Button
-              variant="contained"
-              type="submit"
-              color="primary"
-              disabled={loading}
-              fullWidth
-              onClick={signupRedirect}
-              className={LoginFormClasses.button}
-            >
-              {loading ? (
-                <CircularProgress
-                  className={LoginFormClasses.icon}
-                  size={19}
-                  thickness={3}
-                />
-              ) : (
-                "Signup"
-              )}
-            </Button>
-          </CardContent>
-        </StyledForm>
-      </Paper>
+          <Button
+            variant="contained"
+            type="submit"
+            color="primary"
+            disabled={loading}
+            fullWidth
+            className={LoginFormClasses.button}
+          >
+            {loading ? (
+              <CircularProgress
+                className={LoginFormClasses.icon}
+                size={19}
+                thickness={3}
+              />
+            ) : (
+              translate("ra.auth.sign_in")
+            )}
+          </Button>
+          <Button
+            variant="contained"
+            type="submit"
+            color="primary"
+            disabled={loading}
+            fullWidth
+            onClick={signupRedirect}
+            className={LoginFormClasses.button}
+          >
+            {loading ? (
+              <CircularProgress
+                className={LoginFormClasses.icon}
+                size={19}
+                thickness={3}
+              />
+            ) : (
+              "Signup"
+            )}
+          </Button>
+        </CardContent>
+      </StyledForm>
+    </Paper>
   );
 };
 

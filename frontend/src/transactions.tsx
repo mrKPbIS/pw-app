@@ -1,16 +1,14 @@
 import React from "react";
 import {
+  AutocompleteInput,
   Create,
   Datagrid,
   List,
   ReferenceInput,
-  SelectInput,
   SimpleForm,
-  SimpleList,
   TextField,
   TextInput,
   useAuthenticated,
-  useGetIdentity,
 } from "react-admin";
 
 export const TransactionsList = () => {
@@ -34,7 +32,7 @@ export const TransactionCreate = () => {
     <Create>
       <SimpleForm>
         <ReferenceInput source="recipientId" reference="users">
-          <SelectInput optionText="name" />
+          <AutocompleteInput optionText="name" />
         </ReferenceInput>
         <TextInput source="amount" />
       </SimpleForm>
