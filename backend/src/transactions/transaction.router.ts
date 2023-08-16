@@ -64,10 +64,21 @@ transactionRouter.get('/', checkSchema({
       options: value => typeof value === 'string' && !Number.isNaN(Number(value))? Number(value): 0,
     },
   },
+  sort: {
+    customSanitizer: {
+      options: value => {
+        if (typeof value !== 'string') {
+          return [];
+        }
+        const sort = value.split(':');
+        return sort.length === 2? sort: [];
+      }
+    }
+  }
 }, ['query']), async (req: AuthorizedRequestInterface, res, next) => {
   try {
-    const { limit, offset } = req.query;
-    const [transactions, count] = await transactionRepository.findTransactions(req.user, { limit, offset });
+    const { limit, offset, sort } = req.query;
+    const [transactions, count] = await transactionRepository.findTransactions(req.user, { limit, offset, sort });
     // TODO: limit User fields with DTO
     res.send({
       success: true,

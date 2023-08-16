@@ -1,5 +1,5 @@
 import { User } from '../entity/user';
-import { Repository } from 'typeorm';
+import { FindOptionsOrder, Repository } from 'typeorm';
 import { initDataSource } from '../adapters/dataSource';
 import { Transaction } from '../entity/transaction';
 import { TransactionCreateData, TransctionSearchParams } from './interfaces/transaction.interfaces';
@@ -28,14 +28,13 @@ export class TransactionRepository {
   }
 
   async findTransactions(user: User, searchParams: TransctionSearchParams): Promise<[Transaction[], number]> {
-    const { limit, offset } = searchParams;
+    const { limit, offset, sort } = searchParams;
+    const sortOrder: FindOptionsOrder<Transaction> = this.createSortOrder(sort[0], sort[1]);
     return await this.repository.findAndCount({
       where: {
         ownerId: user.id,
       },
-      order: {
-        id: 'ASC',
-      },
+      order: sortOrder,
       relations: {
         owner: true,
         recipient: true,
@@ -70,5 +69,14 @@ export class TransactionRepository {
         return await entityManager.save(transaction);
       }
     );
+  }
+
+  private createSortOrder(key, value) {
+    const [first, ...rest] = key.split('.');
+    if (first === key) {
+      return { [key]: value };
+    } else {
+      return { [first]: this.createSortOrder(rest.join('.'), value) };
+    }
   }
 }

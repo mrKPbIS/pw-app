@@ -3,7 +3,7 @@ import { get, post } from "./transport";
 
 export const dataProvider: DataProvider = {
   getList: async (entity, options) => {
-    const { filter, pagination } = options;
+    const { filter, pagination, sort } = options;
     const params: [string, string][] = [];
     if (filter.q) {
       params.push(["name", filter.q]);
@@ -14,6 +14,9 @@ export const dataProvider: DataProvider = {
         "offset",
         (pagination.perPage * (pagination.page - 1)).toString(),
       ]);
+      if (sort) {
+        params.push(['sort', `${sort.field}:${sort.order}`]);
+      }
     }
     const resp = await get(entity, localStorage.getItem("auth"), params);
     const { success, error, data } = await resp.json();
@@ -36,7 +39,6 @@ export const dataProvider: DataProvider = {
   },
 
   getMany: async (entity, options) => {
-    console.log(options);
     const r = await get(
       `${entity}/${options.ids[0]}`,
       localStorage.getItem("auth"),

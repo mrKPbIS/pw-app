@@ -7,4 +7,5 @@ export interface TransactionCreateData {
 export interface TransctionSearchParams {
   limit: number;
   offset: number;
+  sort: [string, string];
 }

@@ -26,8 +26,9 @@ Frontend TODO:
 1. ~~Transaction create page~~
 1. ~~Create registration page~~
 1. ~~Add search by name to transaction create~~
-1. Add validation to transaction create
-1. Add transaction duplicate
+1. ~~Add transaction duplicate~~
+1. ~~Add validation to transaction create~~
+1. ~~Sort transactions in list~~
 
 
 ## Current problems
