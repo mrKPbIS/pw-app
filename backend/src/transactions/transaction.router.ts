@@ -1,8 +1,10 @@
 import { Router } from 'express';
 import { checkSchema, validationResult } from 'express-validator';
+import { plainToClass } from 'class-transformer';
 import { ForbiddenRequestError, NotFoundError, ValidationError } from '../middleware/errors.middleware';
 import { authorizationMiddleware, AuthorizedRequestInterface } from '../middleware/authorization.middleware';
 import { TransactionRepository } from './transaction.repository';
+import { GetTransactionsResponse } from './dto/getTransactionsResponse.dto';
 
 const transactionRouter = Router();
 const transactionRepository = new TransactionRepository();
@@ -69,21 +71,22 @@ transactionRouter.get('/', checkSchema({
       options: value => {
         if (typeof value !== 'string') {
           return [];
+        } else {
+          const sort = value.split(':');
+          return sort.length === 2? sort: [];
         }
-        const sort = value.split(':');
-        return sort.length === 2? sort: [];
       }
     }
   }
 }, ['query']), async (req: AuthorizedRequestInterface, res, next) => {
   try {
     const { limit, offset, sort } = req.query;
+    console.log(req.query);
     const [transactions, count] = await transactionRepository.findTransactions(req.user, { limit, offset, sort });
-    // TODO: limit User fields with DTO
     res.send({
       success: true,
       data: {
-        transactions,
+        transactions: transactions.map(transaction => plainToClass(GetTransactionsResponse, transaction, { excludeExtraneousValues: true })),
         count,
       },
     });
@@ -104,10 +107,9 @@ transactionRouter.get('/:id', checkSchema({
     if (!transaction) {
       throw new NotFoundError('Transaction not found');
     } else {
-      // TODO: limit User fields with DTO
       res.send({
         success: true,
-        data: transaction,
+        data: transaction => plainToClass(GetTransactionsResponse, transaction, { excludeExtraneousValues: true }),
       });
     }
   } catch (err) {

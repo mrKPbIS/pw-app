@@ -29,7 +29,10 @@ export class TransactionRepository {
 
   async findTransactions(user: User, searchParams: TransctionSearchParams): Promise<[Transaction[], number]> {
     const { limit, offset, sort } = searchParams;
-    const sortOrder: FindOptionsOrder<Transaction> = this.createSortOrder(sort[0], sort[1]);
+    let sortOrder: FindOptionsOrder<Transaction> = { createdAt: 'DESC' };
+    if (sort.length !== 0) {
+      sortOrder = this.createSortOrder(sort[0], sort[1]);
+    }
     return await this.repository.findAndCount({
       where: {
         ownerId: user.id,
