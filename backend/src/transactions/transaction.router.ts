@@ -48,7 +48,7 @@ transactionRouter.post('/', checkSchema({
     });
     res.send({
       success: true,
-      data: transaction,
+      data: plainToClass(GetTransactionsResponse, transaction, { excludeExtraneousValues: true }),
     });
   } catch (err) {
     next(err);
