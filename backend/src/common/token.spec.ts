@@ -1,3 +1,4 @@
+import jwt from 'jsonwebtoken';
 import * as token from './token';
 
 describe('common/token', () => {
@@ -10,17 +11,18 @@ describe('common/token', () => {
     id: 1,
   };
 
-  describe('createToken', () => {
-    it('should create valid token', () => {
-      const t = token.createToken(user);
-      expect(token.decodeToken(t)).toMatchObject(user);
-    });
+  it('should create valid token', () => {
+    const t = token.createToken(user);
+    expect(token.decodeToken(t)).toMatchObject(user);
   });
 
-  describe('decodeToken', () => {
-    it('should return empty object on error', () => {
-      const t = 'nottoken';
-      expect(token.decodeToken(t)).toMatchObject({});
-    });
+  it('should reject non-jwt value', () => {
+    const t = 'nottoken';
+    expect(token.decodeToken(t)).toBe(null);
+  });
+
+  it('should reject forged token', () => {
+    const t = jwt.sign(user, 'notsecret');
+    expect(token.decodeToken(t)).toBe(null);
   });
 });

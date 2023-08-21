@@ -12,7 +12,11 @@ export function createToken(userData: TokenUserData): string {
   return jwt.sign(userData, secret);
 }
 
-export function decodeToken(token: string): TokenUserData {
-  const { id, email } = jwt.decode(token) || {};
-  return { id, email };
+export function decodeToken(token: string): TokenUserData | null {
+  try {
+    const { id, email } = jwt.verify(token, secret);
+    return { id, email };
+  } catch (err) {
+    return null;
+  }
 }
