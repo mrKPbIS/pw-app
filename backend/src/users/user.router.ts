@@ -47,6 +47,14 @@ userRouter.get('/', checkSchema({
   }
 });
 
+userRouter.get('/profile', async (req: AuthorizedRequestInterface, res) => {
+  const user = await userRepository.findById(req.user.id);
+  return res.send({
+    success: true,
+    data: plainToClass(GetUsersProfileResponse, user, { excludeExtraneousValues: true }),
+  });
+});
+
 userRouter.get('/:id', checkSchema({
   id: {
     isNumeric: true,
@@ -58,7 +66,7 @@ userRouter.get('/:id', checkSchema({
   try {
     const user = await userRepository.findById(id);
     if (!user) {
-      throw new NotFoundError('Transaction not found');
+      throw new NotFoundError('User not found');
     } else {
       res.send({
         success: true,
@@ -68,14 +76,6 @@ userRouter.get('/:id', checkSchema({
   } catch (err) {
     next(err);
   }
-});
-
-userRouter.get('/profile', async (req: AuthorizedRequestInterface, res) => {
-  const user = req.user;
-  return res.send({
-    success: true,
-    data: plainToClass(GetUsersProfileResponse, user, { excludeExtraneousValues: true }),
-  });
 });
 
 export default userRouter;

@@ -1,5 +1,5 @@
 import { User } from '../entity/user';
-import { FindOptionsOrder, Repository } from 'typeorm';
+import { FindOptionsOrder, PropertyType, Repository } from 'typeorm';
 import { initDataSource } from '../adapters/dataSource';
 import { Transaction } from '../entity/transaction';
 import { TransactionCreateData, TransctionSearchParams } from './interfaces/transaction.interfaces';
@@ -27,7 +27,7 @@ export class TransactionRepository {
     });
   }
 
-  async findTransactions(user: User, searchParams: TransctionSearchParams): Promise<[Transaction[], number]> {
+  async findTransactions(userId: PropertyType<User, 'id'>, searchParams: TransctionSearchParams): Promise<[Transaction[], number]> {
     const { limit, offset, sort } = searchParams;
     let sortOrder: FindOptionsOrder<Transaction> = { createdAt: 'DESC' };
     if (sort.length !== 0) {
@@ -35,7 +35,7 @@ export class TransactionRepository {
     }
     return await this.repository.findAndCount({
       where: {
-        ownerId: user.id,
+        ownerId: userId,
       },
       order: sortOrder,
       relations: {

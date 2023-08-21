@@ -35,16 +35,16 @@ transactionRouter.post('/', checkSchema({
       throw new ValidationError(validation);
     }
     const { recipientId, amount } = req.body;
-    const sender = req.user;
+    const senderId = req.user.id;
 
-    if (sender.id === recipientId) {
+    if (senderId === recipientId) {
       throw new ForbiddenRequestError('Not allowed to transfer to self');
     }
 
     const transaction = await transactionRepository.createTransaction({
       amount,
       recipientId,
-      senderId: sender.id,
+      senderId,
     });
     res.send({
       success: true,
@@ -82,7 +82,7 @@ transactionRouter.get('/', checkSchema({
   try {
     const { limit, offset, sort } = req.query;
     console.log(req.query);
-    const [transactions, count] = await transactionRepository.findTransactions(req.user, { limit, offset, sort });
+    const [transactions, count] = await transactionRepository.findTransactions(req.user.id, { limit, offset, sort });
     res.send({
       success: true,
       data: {
