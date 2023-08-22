@@ -51,8 +51,8 @@ export class TransactionRepository {
     const manager = this.repository.manager;
     return await manager.transaction('READ UNCOMMITTED',
       async (entityManager) => {
-        const sender = await entityManager.findOneBy(User, { id: transactionCreateData.senderId });
-        const recipient = await entityManager.findOneBy(User, { id: transactionCreateData.recipientId });
+        const sender = await entityManager.findOne(User, { where : { id: transactionCreateData.senderId }, lock: { mode: 'pessimistic_write' } });
+        const recipient = await entityManager.findOne(User, { where : { id: transactionCreateData.recipientId }, lock: { mode: 'pessimistic_write' } });
         if (!sender || !recipient) {
           throw new BadRequestError('Unable to find user');
         }
