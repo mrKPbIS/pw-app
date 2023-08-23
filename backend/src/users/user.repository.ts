@@ -6,13 +6,21 @@ import { DEFAULT_STARTING_BALANCE } from '../common/balance';
 import { UserCreateData, UserSearchParams } from './interfaces/user.interfaces';
 
 export class UserRepository {
-  private repository: Repository<User>;
-  constructor() {
+  private static instance: UserRepository;
+  private repository: Repository<User> | null;
+
+  public static getInstance() {
+    if (!UserRepository.instance) {
+      UserRepository.instance = new UserRepository();
+    }
+    return UserRepository.instance;
+  }
+
+  private constructor() {
     this.init();
   }
 
-  // TODO: fix multiple inits
-  async init() {
+  private async init() {
     this.repository = (await initDataSource()).getRepository(User);
     console.log('User repository initialized');
   }

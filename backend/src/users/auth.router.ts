@@ -5,7 +5,7 @@ import { BadRequestError, ForbiddenRequestError, NotFoundError, ValidationError 
 import { UserRepository } from './user.repository';
 
 const authRouter = Router();
-const userRepository = new UserRepository();
+const userRepository = UserRepository.getInstance();
 
 authRouter.post('/register', checkSchema({
   email: {

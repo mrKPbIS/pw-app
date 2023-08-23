@@ -7,12 +7,21 @@ import { BadRequestError } from '../middleware/errors.middleware';
 import { compareBalance } from '../common/balance';
 
 export class TransactionRepository {
+  private static instance: TransactionRepository;
   private repository: Repository<Transaction>;
-  constructor() {
+
+  public static getInstance() {
+    if (!TransactionRepository.instance) {
+      TransactionRepository.instance = new TransactionRepository();
+    }
+    return TransactionRepository.instance;
+  }
+
+  private constructor() {
     this.init();
   }
 
-  async init() {
+  private async init() {
     this.repository = (await initDataSource()).getRepository(Transaction);
     console.log('Transaction repository initialized');
   }

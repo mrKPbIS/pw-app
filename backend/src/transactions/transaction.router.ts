@@ -7,7 +7,7 @@ import { TransactionRepository } from './transaction.repository';
 import { GetTransactionsResponse } from './dto/getTransactionsResponse.dto';
 
 const transactionRouter = Router();
-const transactionRepository = new TransactionRepository();
+const transactionRepository = TransactionRepository.getInstance();
 
 transactionRouter.use(authorizationMiddleware);
 

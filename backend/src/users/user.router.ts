@@ -8,7 +8,7 @@ import { GetUsersProfileResponse } from './dto/getUsersProfileResponse.dto';
 import { NotFoundError } from '../middleware/errors.middleware';
 
 const userRouter = Router();
-const userRepository = new UserRepository();
+const userRepository = UserRepository.getInstance();
 
 userRouter.use(authorizationMiddleware);
 
