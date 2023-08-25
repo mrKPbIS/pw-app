@@ -7,7 +7,7 @@ import { UserCreateData, UserSearchParams } from './interfaces/user.interfaces';
 
 export class UserRepository {
   private static instance: UserRepository;
-  private repository: Repository<User> | null;
+  repository: Repository<User> | null;
 
   public static getInstance() {
     if (!UserRepository.instance) {
