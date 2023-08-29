@@ -1,22 +1,47 @@
 import express, {} from 'express';
 import cors from 'cors';
-import transactionRouter from './transactions/transaction.router';
 import { errorHandler } from './middleware/errors.middleware';
-import authRouter from './users/auth.router';
-import userRouter from './users/user.router';
+import { AppDataSource } from './adapters/dataSource';
+import config from './config';
+import { User } from './entity/user';
+import { Transaction } from './entity/transaction';
+import { userModule } from './users';
+import { transactionModule } from './transactions';
 
-const app = express();
+export default async function() {
+  const app = express();
+  const entities = [User, Transaction];
+  const dataSource = new AppDataSource({
+    type: 'mssql',
+    host: config.DB_HOST,
+    port: config.DB_PORT,
+    username: config.DB_USERNAME,
+    password: config.DB_PASSWORD,
+    database: config.DB_NAME,
+    // TODO: app crashes if synchronize set true and DB already exists
+    synchronize: false,
+    entities,
+    extra: {
+      trustServerCertificate: true,
+    },
+    logging: true,
+  }, entities.map(entity => entity.name));
 
-app.use(cors({
-  origin: '*',
-}));
-app.use(express.json());
-app.use('/api/auth', authRouter);
-app.use('/api/users', userRouter);
-app.use('/api/transactions', transactionRouter);
-app.use('/ping', (req, res) => {
-  res.send('pong');
-});
-app.use(errorHandler);
+  await dataSource.init();
+  const { authRouter, userRouter } = userModule(dataSource.getRepository(User.name));
+  const { transactionRouter } = transactionModule(dataSource.getRepository(Transaction.name));
 
-export default app;
+  app.use(cors({
+    origin: '*',
+  }));
+  app.use(express.json());
+  app.use('/api/auth', authRouter);
+  app.use('/api/users', userRouter);
+  app.use('/api/transactions', transactionRouter);
+  app.use('/ping', (req, res) => {
+    res.send('pong');
+  });
+  app.use(errorHandler);
+
+  return app;
+}

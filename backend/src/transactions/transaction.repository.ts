@@ -1,28 +1,23 @@
 import { User } from '../entity/user';
 import { FindOptionsOrder, PropertyType, Repository } from 'typeorm';
-import { initDataSource } from '../adapters/dataSource';
 import { Transaction } from '../entity/transaction';
 import { TransactionCreateData, TransctionSearchParams } from './interfaces/transaction.interfaces';
 import { BadRequestError } from '../middleware/errors.middleware';
 import { compareBalance } from '../common/balance';
 
-export class TransactionRepository {
-  private static instance: TransactionRepository;
+export class TransactionService {
+  private static instance: TransactionService;
   private repository: Repository<Transaction>;
 
-  public static getInstance() {
-    if (!TransactionRepository.instance) {
-      TransactionRepository.instance = new TransactionRepository();
+  public static getInstance(repository: Repository<Transaction>) {
+    if (!TransactionService.instance) {
+      TransactionService.instance = new TransactionService(repository);
     }
-    return TransactionRepository.instance;
+    return TransactionService.instance;
   }
 
-  private constructor() {
-    this.init();
-  }
-
-  private async init() {
-    this.repository = (await initDataSource()).getRepository(Transaction);
+  private constructor(repository: Repository<Transaction>) {
+    this.repository = repository;
     console.log('Transaction repository initialized');
   }
 
