@@ -80,8 +80,11 @@ export default function(transactionService: TransactionService): Router {
     }
   }, ['query']), async (req: AuthorizedRequestInterface, res, next) => {
     try {
+      const validation = validationResult(req);
+      if (!validation.isEmpty()) {
+        throw new ValidationError(validation);
+      }
       const { limit, offset, sort } = req.query;
-      console.log(req.query);
       const [transactions, count] = await transactionService.findTransactions(req.user.id, { limit, offset, sort });
       res.send({
         success: true,
@@ -101,15 +104,19 @@ export default function(transactionService: TransactionService): Router {
       errorMessage: 'should be UUID',
     }
   }, ['params']), async (req: AuthorizedRequestInterface, res, next) => {
-    const { id } = req.params;
     try {
+      const validation = validationResult(req);
+      if (!validation.isEmpty()) {
+        throw new ValidationError(validation);
+      }
+      const { id } = req.params;
       const transaction = await transactionService.findById(id);
       if (!transaction) {
         throw new NotFoundError('Transaction not found');
       } else {
         res.send({
           success: true,
-          data: transaction => plainToClass(GetTransactionsResponse, transaction, { excludeExtraneousValues: true }),
+          data: plainToClass(GetTransactionsResponse, transaction, { excludeExtraneousValues: true }),
         });
       }
     } catch (err) {
