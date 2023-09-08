@@ -33,9 +33,16 @@ export class User {
     password: string;
 
   @Column({
-    type: 'varchar',
-    length: 15,
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
     nullable: false,
+    transformer: {
+      from: (value) => {
+        return Number(value).toFixed(2);
+      },
+      to: (value) => value,
+    }
   })
     balance: string;
 

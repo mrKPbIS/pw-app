@@ -1,14 +1,10 @@
-import { User } from '../entity/user';
-import { decodeToken } from '../common/token';
-import { UserRepository } from '../users/user.repository';
-import { ForbiddenRequestError, UnauthorizedRequestError } from './errors.middleware';
-
-const userRepository = new UserRepository();
+import { decodeToken, TokenUserData } from '../common/token';
+import { UnauthorizedRequestError } from './errors.middleware';
 
 //  move interface to separated file
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface AuthorizedRequestInterface extends Record<string, any> {
-  user?: User,
+  user?: TokenUserData,
 }
 
 export async function authorizationMiddleware(req, res, next) {
@@ -20,14 +16,10 @@ export async function authorizationMiddleware(req, res, next) {
     const bearer = bearerHeaders.split(' ');
     const bearerToken = bearer[1];
     const userData = decodeToken(bearerToken);
-    if (typeof userData.id !== 'number') {
+    if (!userData) {
       throw new UnauthorizedRequestError('Provided bearer token is broken');
     } else {
-      const user = await userRepository.findById(userData.id);
-      if (!user) {
-        throw new ForbiddenRequestError('User not found');
-      }
-      req.user = user;
+      req.user = userData;
       next();
     }
   } catch (err) {

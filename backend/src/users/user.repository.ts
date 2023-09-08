@@ -1,19 +1,22 @@
 import { Like, Repository } from 'typeorm';
 import { hash, compare } from 'bcryptjs';
-import { initDataSource } from '../adapters/dataSource';
 import { User } from '../entity/user';
 import { DEFAULT_STARTING_BALANCE } from '../common/balance';
 import { UserCreateData, UserSearchParams } from './interfaces/user.interfaces';
 
-export class UserRepository {
-  private repository: Repository<User>;
-  constructor() {
-    this.init();
+export class UserService {
+  private static instance: UserService;
+  repository: Repository<User>;
+
+  public static getInstance(repository: Repository<User>) {
+    if (!UserService.instance) {
+      UserService.instance = new UserService(repository);
+    }
+    return UserService.instance;
   }
 
-  // TODO: fix multiple inits
-  async init() {
-    this.repository = (await initDataSource()).getRepository(User);
+  private constructor(repository: Repository<User>) {
+    this.repository = repository;
     console.log('User repository initialized');
   }
 

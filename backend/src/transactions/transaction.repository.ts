@@ -1,19 +1,23 @@
 import { User } from '../entity/user';
-import { FindOptionsOrder, Repository } from 'typeorm';
-import { initDataSource } from '../adapters/dataSource';
+import { FindOptionsOrder, PropertyType, Repository } from 'typeorm';
 import { Transaction } from '../entity/transaction';
 import { TransactionCreateData, TransctionSearchParams } from './interfaces/transaction.interfaces';
-import { compareBalance, incrementBalance, substractBalance } from '../common/balance';
 import { BadRequestError } from '../middleware/errors.middleware';
+import { compareBalance } from '../common/balance';
 
-export class TransactionRepository {
+export class TransactionService {
+  private static instance: TransactionService;
   private repository: Repository<Transaction>;
-  constructor() {
-    this.init();
+
+  public static getInstance(repository: Repository<Transaction>) {
+    if (!TransactionService.instance) {
+      TransactionService.instance = new TransactionService(repository);
+    }
+    return TransactionService.instance;
   }
 
-  async init() {
-    this.repository = (await initDataSource()).getRepository(Transaction);
+  private constructor(repository: Repository<Transaction>) {
+    this.repository = repository;
     console.log('Transaction repository initialized');
   }
 
@@ -27,7 +31,7 @@ export class TransactionRepository {
     });
   }
 
-  async findTransactions(user: User, searchParams: TransctionSearchParams): Promise<[Transaction[], number]> {
+  async findTransactions(userId: PropertyType<User, 'id'>, searchParams: TransctionSearchParams): Promise<[Transaction[], number]> {
     const { limit, offset, sort } = searchParams;
     let sortOrder: FindOptionsOrder<Transaction> = { createdAt: 'DESC' };
     if (sort.length !== 0) {
@@ -35,7 +39,7 @@ export class TransactionRepository {
     }
     return await this.repository.findAndCount({
       where: {
-        ownerId: user.id,
+        ownerId: userId,
       },
       order: sortOrder,
       relations: {
@@ -49,25 +53,35 @@ export class TransactionRepository {
 
   async createTransaction(transactionCreateData: TransactionCreateData): Promise<Transaction> {
     const manager = this.repository.manager;
-    return await manager.transaction('READ UNCOMMITTED',
+    return await manager.transaction('READ COMMITTED',
       async (entityManager) => {
-        const sender = await entityManager.findOneBy(User, { id: transactionCreateData.senderId });
-        const recipient = await entityManager.findOneBy(User, { id: transactionCreateData.recipientId });
+        const sender = await entityManager.findOne(User, { where : { id: transactionCreateData.senderId }, lock: { mode: 'pessimistic_write' } });
+        const recipient = await entityManager.findOne(User, { where : { id: transactionCreateData.recipientId }, lock: { mode: 'pessimistic_write' } });
         if (!sender || !recipient) {
           throw new BadRequestError('Unable to find user');
         }
         if (!compareBalance(sender.balance, transactionCreateData.amount)) {
           throw new BadRequestError('Incorrect amount value');
         }
-        const senderBalance = substractBalance(sender.balance, transactionCreateData.amount);
-        const recipientBalance = incrementBalance(recipient.balance, transactionCreateData.amount);
-        await entityManager.update(User, { id: sender.id }, { balance: senderBalance });
-        await entityManager.update(User, { id: recipient.id }, { balance: recipientBalance });
+        await entityManager.increment(User, { id: recipient.id }, 'balance', transactionCreateData.amount);
+        await entityManager.decrement(User, { id: sender.id }, 'balance', transactionCreateData.amount);
+
+        const { balance: balanceAfter } = await entityManager.findOne(
+          User,
+          {
+            where: {
+              id: transactionCreateData.senderId,
+            },
+            select: {
+              balance: true,
+            },
+          }
+        );
         const transaction = entityManager.create(Transaction, {
           ownerId: sender.id,
           recipientId: recipient.id,
           amount: transactionCreateData.amount,
-          amountAfter: senderBalance,
+          amountAfter: balanceAfter,
         });
         return await entityManager.save(transaction);
       }

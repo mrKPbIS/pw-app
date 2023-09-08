@@ -1,44 +1,34 @@
-import config from '../config';
-import { DataSource } from 'typeorm';
-import { User } from '../entity/user';
-import { Transaction } from '../entity/transaction';
+import { DataSource, Repository, DataSourceOptions } from 'typeorm';
 
-let AppDataSource: DataSource | null = null;
-let dataSource: DataSource | null = null;
+export class AppDataSource {
+  private dataSource: DataSource;
+  private entities: string[];
+  private repositories: Map<string, Repository<any>>;
 
-async function getDataSource() {
-  if (!dataSource) {
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    return getDataSource();
-  } else {
-    return dataSource;
+  constructor(dataSourceConfig: DataSourceOptions, entities: string[]) {
+    this.entities = entities;
+    this.dataSource = new DataSource(dataSourceConfig);
+    this.repositories = new Map();
   }
-}
 
-export async function initDataSource() {
-  try {
-    if (AppDataSource === null) {
-      AppDataSource = new DataSource({
-        type: 'mssql',
-        host: config.DB_HOST,
-        port: config.DB_PORT,
-        username: config.DB_USERNAME,
-        password: config.DB_PASSWORD,
-        database: config.DB_NAME,
-        // TODO: app crashes if synchronize set true and DB already exists
-        synchronize: false,
-        entities: [User, Transaction],
-        extra: {
-          trustServerCertificate: true,
-        },
-        logging: true,
-      });
-      dataSource = await AppDataSource.initialize();
+  async init() {
+    try {
+      await this.dataSource.initialize();
       console.log('Data source initialized');
+      for(const entity of this.entities) {
+        this.repositories.set(entity, await this.dataSource.getRepository(entity));
+      }
     }
-    return getDataSource();
-  } catch (err) {
-    console.log('Error during initializing Data Source');
-    throw err;
+    catch(err) {
+      console.log('Error during initializing Data Source');
+      throw err;
+    }
+  }
+
+  getRepository(entity: string): Repository<any> | null {
+    if (!this.dataSource.isInitialized) {
+      return null;
+    }
+    return this.repositories.get(entity);
   }
 }

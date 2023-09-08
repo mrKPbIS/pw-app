@@ -22,15 +22,29 @@ export class Transaction {
     recipientId: number;
 
   @Column({
-    type: 'varchar',
-    length: 15,
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    transformer: {
+      from: (value) => {
+        return Number(value).toFixed(2);
+      },
+      to: (value) => value,
+    }
   })
     amount: string;
 
   @Column({
-    type: 'varchar',
-    length: 15,
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
     name: 'amount_after',
+    transformer: {
+      from: (value) => {
+        return Number(value).toFixed(2);
+      },
+      to: (value) => value,
+    }
   })
     amountAfter: string;
 
