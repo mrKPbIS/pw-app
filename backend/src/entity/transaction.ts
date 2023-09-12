@@ -38,7 +38,7 @@ export class Transaction {
     type: 'decimal',
     precision: 10,
     scale: 2,
-    name: 'amount_after',
+    name: 'owner_balance',
     transformer: {
       from: (value) => {
         return Number(value).toFixed(2);
@@ -46,7 +46,21 @@ export class Transaction {
       to: (value) => value,
     }
   })
-    amountAfter: string;
+    ownerBalance: string;
+
+    @Column({
+      type: 'decimal',
+      precision: 10,
+      scale: 2,
+      name: 'recipient_balance',
+      transformer: {
+        from: (value) => {
+          return Number(value).toFixed(2);
+        },
+        to: (value) => value,
+      }
+    })
+      recipientBalance: string;
 
   @Column({
     type: 'datetime',

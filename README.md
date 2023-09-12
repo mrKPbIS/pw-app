@@ -15,7 +15,9 @@ Backend TODO:
 1. ~~Add errors handling~~
 1. ~~Add input validation~~
 1. ~~Add indexes~~
-1. Add tests
+1. ~~Add tests~~
+1. ~~Add sockets.io~~
+1. ~~Sockets.io evento on new transaction~~
 1. Fix TODO's
 
 Frontend TODO:

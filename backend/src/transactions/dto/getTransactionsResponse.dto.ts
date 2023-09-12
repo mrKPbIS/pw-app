@@ -15,7 +15,10 @@ export class GetTransactionsResponse {
     amount: string;
 
   @Expose()
-    amountAfter: string;
+    ownerBalance: string;
+
+  @Expose()
+    recipientBalance: string;
 
   @Expose()
     createdAt: Date;

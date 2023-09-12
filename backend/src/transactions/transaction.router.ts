@@ -1,12 +1,13 @@
 import { Router } from 'express';
 import { checkSchema, validationResult } from 'express-validator';
 import { plainToClass } from 'class-transformer';
+import { Server } from 'socket.io';
 import { ForbiddenRequestError, NotFoundError, ValidationError } from '../middleware/errors.middleware';
 import { authorizationMiddleware, AuthorizedRequestInterface } from '../middleware/authorization.middleware';
 import { TransactionService } from './transaction.repository';
 import { GetTransactionsResponse } from './dto/getTransactionsResponse.dto';
 
-export default function(transactionService: TransactionService): Router {
+export default function(transactionService: TransactionService, io: Server): Router {
   const transactionRouter = Router();
 
   transactionRouter.use(authorizationMiddleware);
@@ -46,6 +47,7 @@ export default function(transactionService: TransactionService): Router {
         recipientId,
         senderId,
       });
+      io.emit('transaction', transaction);
       res.send({
         success: true,
         data: plainToClass(GetTransactionsResponse, transaction, { excludeExtraneousValues: true }),
