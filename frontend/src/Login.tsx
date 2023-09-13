@@ -73,9 +73,9 @@ export const LoginForm = (props: LoginFormProps) => {
         <CardContent className={LoginFormClasses.content}>
           <TextInput
             autoFocus
-            source="username"
-            label={translate("ra.auth.username")}
-            autoComplete="username"
+            source="email"
+            label="email"
+            autoComplete="email"
             validate={required()}
             fullWidth
           />

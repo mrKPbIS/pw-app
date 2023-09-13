@@ -1,6 +1,5 @@
 import { AuthProvider, HttpError } from "react-admin";
 import jwtDecode from "jwt-decode";
-import { API_BASE_URL } from "./constants";
 import { post } from "./transport";
 
 export type CustomAuthProvider = AuthProvider & {

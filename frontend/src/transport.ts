@@ -16,7 +16,7 @@ export async function makeRequest(
   params?: Array<[string, string]>,
 ) {
   const headers = new Headers({ "Content-Type": "application/json" });
-  const url = new URL(API_BASE_URL + "/" + route);
+  const url = new URL(API_BASE_URL + "/api/" + route);
   headers.append("ngrok-skip-browser-warning", "true");
   if (auth) {
     headers.append("Authorization", `Bearer ${auth}`);
