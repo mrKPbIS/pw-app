@@ -1,5 +1,7 @@
-import express, {} from 'express';
+import express from 'express';
 import cors from 'cors';
+import http from 'http';
+import { Server } from 'socket.io';
 import { errorHandler } from './middleware/errors.middleware';
 import { AppDataSource } from './adapters/dataSource';
 import config from './config';
@@ -10,6 +12,11 @@ import { transactionModule } from './transactions';
 
 export default async function() {
   const app = express();
+  const server = http.createServer(app);
+  const io = new Server(
+    server,
+    { cors: { origin: '*', } }
+  );
   const entities = [User, Transaction];
   const dataSource = new AppDataSource({
     type: 'mssql',
@@ -29,7 +36,7 @@ export default async function() {
 
   await dataSource.init();
   const { authRouter, userRouter } = userModule(dataSource.getRepository(User.name));
-  const { transactionRouter } = transactionModule(dataSource.getRepository(Transaction.name));
+  const { transactionRouter } = transactionModule(dataSource.getRepository(Transaction.name), io);
 
   app.use(cors({
     origin: '*',
@@ -43,5 +50,9 @@ export default async function() {
   });
   app.use(errorHandler);
 
-  return app;
+  io.on('connection', (socket) => {
+    console.log('new socket connection');
+  });
+
+  return server;
 }

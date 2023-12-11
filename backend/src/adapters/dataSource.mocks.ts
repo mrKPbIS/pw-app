@@ -3,6 +3,16 @@ import { randomUUID } from 'crypto';
 export function mockEntityManager(users, transactions) {
   const entityManager = {
     transaction: jest.fn((level, cb) => cb(entityManager)),
+    find: jest.fn(({ name }, { where }) => {
+      const { id } = where;
+      // findOperator
+      const filterFunc = (it) => id._value.includes(it.id);
+      if (name === 'User') {
+        return users.filter(filterFunc);
+      } else {
+        return transactions.filter(filterFunc);
+      }
+    }),
     findOne: jest.fn(({ name }, { where }) => {
       const { id } = where;
       const filterFunc = (it) => it.id === id;

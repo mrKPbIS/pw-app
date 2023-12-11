@@ -15,7 +15,9 @@ Backend TODO:
 1. ~~Add errors handling~~
 1. ~~Add input validation~~
 1. ~~Add indexes~~
-1. Add tests
+1. ~~Add tests~~
+1. ~~Add sockets.io~~
+1. ~~Sockets.io evento on new transaction~~
 1. Fix TODO's
 
 Frontend TODO:
@@ -33,7 +35,6 @@ Frontend TODO:
 
 ## Current problems
 
-1. [Duplicate initiation of entity repositories](backend/src/users/user.repository.ts#14)
 1. [App crashes with dataSource synchronization](backend/src/adapters/dataSource.ts#28)
 1. [Login page renders in upper left corner](frontend/src/App.tsx)
 
@@ -56,3 +57,7 @@ Frontend TODO:
 - amount: varchar(15), not null
 - amountAfter: varchar(15), not null
 - created_at: datetime
+
+### Sockets
+
+postman workspace: https://www.postman.com/speeding-resonance-3855/workspace/pw-app/collection/65007d08fdf5370744b0f96b?action=share&creator=8044404
