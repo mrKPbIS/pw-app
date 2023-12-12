@@ -2,22 +2,22 @@
 
 import { Box, Button, Container, List, ListItemText, ListItemButton, AppBar, Typography, Paper, Toolbar } from '@mui/material';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { SyntheticEvent, useEffect, useState } from 'react';
 import { getProfile } from '../api/api';
-import { getToken, getUser, isAuthentificated, logout } from '../api/auth';
+import { getToken, getUser, isAuthenticated, logout } from '../api/auth';
 
 export default function Profile() {
 
-  const [data, setData] = useState({});
+  const [data, setData] = useState({ name: '', email: '', balance: ''});
   const { id: userId } = getUser();
   const token = getToken();
   const router = useRouter();
 
-  if (!isAuthentificated()) {
+  if (!isAuthenticated()) {
     router.push('/login');
   }
 
-  const logoutHandler = (e) => {
+  const logoutHandler = (e: SyntheticEvent) => {
     e.preventDefault();
     logout();
     router.push('/login')
@@ -27,7 +27,7 @@ export default function Profile() {
     async function fetchData() {
       try {
         const res = await getProfile(token, userId);
-        if (res.success) {
+        if (res.success && res.data) {
           setData(res.data);
         } else {
           console.log(res.error);
@@ -55,7 +55,7 @@ export default function Profile() {
               <ListItemText primary={data.name} secondary="Name"/>
               <ListItemText primary={data.email} secondary="Email"/>
               <ListItemText primary={data.balance} secondary="Balance"/>
-            <ListItemButton href="/transactions/create">
+            <ListItemButton href="/transactions/create?t=test">
               <ListItemText primary="New transaction"/>
             </ListItemButton>
             <ListItemButton href="/transactions">

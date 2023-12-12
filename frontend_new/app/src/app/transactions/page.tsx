@@ -1,12 +1,23 @@
 'use client';
 
-import { Box, Container, List, ListItemText, AppBar, Button, Typography, Paper, Toolbar, ListItem, ListSubheader, BottomNavigation, Pagination } from '@mui/material';
+import { 
+  Box,
+  Container, 
+  List, 
+  ListItemText, 
+  AppBar, 
+  Button, 
+  Typography, 
+  Paper, 
+  Toolbar, 
+  ListItem, 
+  Pagination } from '@mui/material';
 import { useState, useEffect } from 'react';
-import { getTransactions } from '../api/api';
+import { getTransactions, GetTransactionsItemResponse } from '../api/api';
 import { getToken, getUser } from '../api/auth';
 
 export default function TransactionsList() {
-  const [data, setData] = useState({ transactions: [], count: 0 });
+  const [data, setData] = useState({ transactions: new Array(), count: 0 });
   const { transactions, count } = data;
 
   const token = getToken();
@@ -14,7 +25,7 @@ export default function TransactionsList() {
   useEffect(() => {
     async function fetchData() {
       const res = await getTransactions(token);
-      if (res.success) {
+      if (res.success && res.data) {
         setData(res.data);
       } else {
         console.log(res.error);
@@ -53,7 +64,7 @@ export default function TransactionsList() {
   )
 }
 
-function TransactionsItem(props) {
+function TransactionsItem(props: { transaction: GetTransactionsItemResponse}) {
   const { id: userId } = getUser();
   const { owner, recipient, amount } = props.transaction;
   let elem;

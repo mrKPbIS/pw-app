@@ -1,7 +1,7 @@
 'use client';
 
-import { Box, Button, Container, List, ListItemText, ListItemButton, AppBar, Typography, Paper, Toolbar, TextField, ListItem, CircularProgress } from '@mui/material';
-import { useState } from 'react';
+import { Box, Button, Container, List, ListItemText, AppBar, Typography, Paper, Toolbar, TextField, ListItem, CircularProgress } from '@mui/material';
+import { SyntheticEvent, useState } from 'react';
 import { useRouter } from 'next/navigation'
 import { login } from '../api/api';
 import { saveToken } from '../api/auth';
@@ -17,12 +17,12 @@ export default function Login() {
 
   
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event: SyntheticEvent) => {
     event.preventDefault();
     setLoading(true);
     try {
-      const res = await login(email, password);
-      if(res.success) {
+      const res = await login({email, password});
+      if(res.success && res.data) {
         saveToken(res.data);
         router.push('/profile');
       }
