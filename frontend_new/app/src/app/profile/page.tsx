@@ -70,7 +70,7 @@ export default function Profile() {
             <ListItemText primary={data.name} secondary="Name" />
             <ListItemText primary={data.email} secondary="Email" />
             <ListItemText primary={data.balance} secondary="Balance" />
-            <ListItemButton href="/transactions/create?t=test">
+            <ListItemButton href="/transactions/create">
               <ListItemText primary="New transaction" />
             </ListItemButton>
             <ListItemButton href="/transactions">
