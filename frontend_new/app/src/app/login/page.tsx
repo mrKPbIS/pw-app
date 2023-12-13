@@ -12,27 +12,36 @@ import {
   Toolbar,
   TextField,
   ListItem,
-  CircularProgress,
+  Alert,
 } from "@mui/material";
 import { SyntheticEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { login } from "../api/api";
 import { saveToken } from "../api/auth";
+import { validatePassword, validateEmail } from "../api/validators";
 
 export default function Login() {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState(false);
   const [emailError, setEmailError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
   const router = useRouter();
-  const LOGIN_REQ = "login-req";
 
-  const validateForm = () => {};
+  const validateForm = () => {
+    const emailResult = validateEmail(email);
+    const passwordResult = validatePassword(password);
+
+    setEmailError(emailResult);
+    setPasswordError(passwordResult);
+
+    return emailResult || passwordResult;
+  };
 
   const handleSubmit = async (event: SyntheticEvent) => {
     event.preventDefault();
-    setLoading(true);
+    if (validateForm()) {
+      return;
+    }
     try {
       const res = await login({ email, password });
       if (res.success && res.data) {
@@ -42,13 +51,8 @@ export default function Login() {
     } catch (e) {
       console.log(e);
     } finally {
-      setLoading(false);
     }
   };
-
-  if (loading) {
-    return <CircularProgress />;
-  }
 
   return (
     <Box>
@@ -73,7 +77,6 @@ export default function Login() {
                   label="email"
                   variant="filled"
                   error={emailError}
-                  required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
@@ -84,7 +87,7 @@ export default function Login() {
                   id="auth-password"
                   label="password"
                   variant="filled"
-                  required
+                  error={passwordError}
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -99,6 +102,9 @@ export default function Login() {
               </Button>
             </List>
           </form>
+          { emailError? <Alert severity="error" >Email should be email</Alert>: null}
+          { passwordError? <Alert severity="error" >Password is too short</Alert>: null}
+            
         </Paper>
       </Container>
     </Box>

@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Alert,
   Box,
   Button,
   Container,
@@ -12,24 +13,43 @@ import {
   Toolbar,
   TextField,
   ListItem,
-  CircularProgress,
 } from "@mui/material";
 import { SyntheticEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { register } from "../api/api";
 import { saveToken } from "../api/auth";
+import { validateConfirmPassword, validateEmail, validateString, validatePassword } from "../api/validators";
 
 export default function Register() {
   const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [nameError, setNameError] = useState(false);
+  const [emailError, setEmailError] = useState(false);
+  const [passwordError, setPasswordError] = useState(false);
+  const [confirmPasswordError, setConfirmPasswordError] = useState(false);
   const router = useRouter();
+
+  const validateForm = () => {
+    const nameResult = validateString(name);
+    const emailResult = validateEmail(email);
+    const passwordResult = validatePassword(password);
+    const confirmPasswordResult = validateConfirmPassword(password, confirmPassword);
+
+    setNameError(nameResult);
+    setEmailError(emailResult);
+    setPasswordError(passwordResult);
+    setConfirmPasswordError(confirmPasswordResult);
+
+    return nameResult || emailResult || passwordResult || confirmPasswordResult;
+  };
 
   const handleSubmit = async (event: SyntheticEvent) => {
     event.preventDefault();
-    setLoading(true);
+    if (validateForm()) {
+      return;
+    }
     try {
       const res = await register({ email, name, password });
       if (res.success && res.data) {
@@ -38,14 +58,8 @@ export default function Register() {
       }
     } catch (e) {
       console.log(e);
-    } finally {
-      setLoading(false);
     }
   };
-
-  if (loading) {
-    return <CircularProgress />;
-  }
 
   return (
     <Box>
@@ -70,6 +84,7 @@ export default function Register() {
                   label="name"
                   variant="filled"
                   value={name}
+                  error={nameError}
                   onChange={(e) => setName(e.target.value)}
                 />
               </ListItem>
@@ -80,6 +95,7 @@ export default function Register() {
                   label="email"
                   variant="filled"
                   value={email}
+                  error={emailError}
                   onChange={(e) => setEmail(e.target.value)}
                 />
               </ListItem>
@@ -91,6 +107,7 @@ export default function Register() {
                   variant="filled"
                   type="password"
                   value={password}
+                  error={passwordError}
                   onChange={(e) => setPassword(e.target.value)}
                 />
               </ListItem>
@@ -102,6 +119,7 @@ export default function Register() {
                   variant="filled"
                   type="password"
                   value={confirmPassword}
+                  error={confirmPasswordError}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                 />
               </ListItem>
@@ -114,6 +132,10 @@ export default function Register() {
               </Button>
             </List>
           </form>
+          { nameError? <Alert severity="error" >Name is empty</Alert>: null}
+          { emailError? <Alert severity="error" >Email should be email</Alert>: null}
+          { passwordError? <Alert severity="error" >Password is too short</Alert>: null}
+          { confirmPasswordError? <Alert severity="error" >Passwords don&apos;t match</Alert>: null}
         </Paper>
       </Container>
     </Box>

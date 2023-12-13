@@ -12,7 +12,10 @@ import {
   Toolbar,
   ListItem,
   Pagination,
+  ListItemIcon,
+  Link,
 } from "@mui/material";
+import ReplayIcon from '@mui/icons-material/Replay';
 import { useState, useEffect } from "react";
 import { getTransactions, GetTransactionsItemResponse } from "../api/api";
 import { getToken, getUser } from "../api/auth";
@@ -75,19 +78,24 @@ export default function TransactionsList() {
 
 function TransactionsItem(props: { transaction: GetTransactionsItemResponse }) {
   const { id: userId } = getUser();
-  const { owner, recipient, amount } = props.transaction;
+  const { id, owner, recipient, amount } = props.transaction;
   let elem;
   if (userId === owner.id) {
     elem = (
       <ListItem>
         <ListItemText primary={recipient.name} secondary="Transferred to" />
+        <ListItemIcon >
+          <Link href={`/transactions/create?duplicate=${id}`}>
+            <ReplayIcon />
+          </Link>
+        </ListItemIcon>
         <Typography align="right">{amount}</Typography>
       </ListItem>
     );
   } else {
     elem = (
       <ListItem>
-        <ListItemText primary={owner.name} secondary="Received from" />
+        <ListItemText primary={owner.name} secondary="Received from"/>
         <Typography align="right" color="green">
           +{amount}
         </Typography>
