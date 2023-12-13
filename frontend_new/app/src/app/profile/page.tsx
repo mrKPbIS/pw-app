@@ -1,27 +1,37 @@
-'use client';
+"use client";
 
-import { Box, Button, Container, List, ListItemText, ListItemButton, AppBar, Typography, Paper, Toolbar } from '@mui/material';
-import { useRouter } from 'next/navigation';
-import { SyntheticEvent, useEffect, useState } from 'react';
-import { getProfile } from '../api/api';
-import { getToken, getUser, isAuthenticated, logout } from '../api/auth';
+import {
+  Box,
+  Button,
+  Container,
+  List,
+  ListItemText,
+  ListItemButton,
+  AppBar,
+  Typography,
+  Paper,
+  Toolbar,
+} from "@mui/material";
+import { useRouter } from "next/navigation";
+import { SyntheticEvent, useEffect, useState } from "react";
+import { getProfile } from "../api/api";
+import { getToken, getUser, isAuthenticated, logout } from "../api/auth";
 
 export default function Profile() {
-
-  const [data, setData] = useState({ name: '', email: '', balance: ''});
+  const [data, setData] = useState({ name: "", email: "", balance: "" });
   const { id: userId } = getUser();
   const token = getToken();
   const router = useRouter();
 
   if (!isAuthenticated()) {
-    router.push('/login');
+    router.push("/login");
   }
 
   const logoutHandler = (e: SyntheticEvent) => {
     e.preventDefault();
     logout();
-    router.push('/login')
-  }
+    router.push("/login");
+  };
 
   useEffect(() => {
     async function fetchData() {
@@ -32,7 +42,7 @@ export default function Profile() {
         } else {
           console.log(res.error);
         }
-      } catch(e){ 
+      } catch (e) {
         console.log(e);
       }
     }
@@ -41,30 +51,34 @@ export default function Profile() {
 
   return (
     <Box>
-      <AppBar position='static'>
+      <AppBar position="static">
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             PW app
           </Typography>
-          <Button color="inherit" onClick={logoutHandler}>Logout</Button>
+          <Button color="inherit" onClick={logoutHandler}>
+            Logout
+          </Button>
         </Toolbar>
       </AppBar>
       <Container component="main" maxWidth="sm" sx={{ mb: 4 }}>
-        <Paper variant="outlined" sx={{ my: { xs: 3, md: 6 }, p: { xs: 2, md: 3 } }}>
+        <Paper
+          variant="outlined"
+          sx={{ my: { xs: 3, md: 6 }, p: { xs: 2, md: 3 } }}
+        >
           <List>
-              <ListItemText primary={data.name} secondary="Name"/>
-              <ListItemText primary={data.email} secondary="Email"/>
-              <ListItemText primary={data.balance} secondary="Balance"/>
+            <ListItemText primary={data.name} secondary="Name" />
+            <ListItemText primary={data.email} secondary="Email" />
+            <ListItemText primary={data.balance} secondary="Balance" />
             <ListItemButton href="/transactions/create?t=test">
-              <ListItemText primary="New transaction"/>
+              <ListItemText primary="New transaction" />
             </ListItemButton>
             <ListItemButton href="/transactions">
-              <ListItemText primary="Transactions history"/>
+              <ListItemText primary="Transactions history" />
             </ListItemButton>
-            
           </List>
         </Paper>
       </Container>
     </Box>
-  )
+  );
 }
