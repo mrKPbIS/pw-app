@@ -139,6 +139,20 @@ export async function getTransactions(token: string) {
   return res;
 }
 
+export async function getTransaction(token: string, id: string) {
+  const headers = {
+    ...credentialsHeaders(token),
+    "ngrok-skip-browser-warning": "true",
+  };
+  const res = await request<GetTransactionsItemResponse>(
+    `${API_BASE_URL}${API_TRANSACTIONS_PATH}/${id}`,
+    "GET",
+    headers,
+    null,
+  );
+  return res;
+}
+
 function credentialsHeaders(token: string) {
   return { Authorization: `Bearer ${token}` };
 }

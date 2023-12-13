@@ -1,6 +1,6 @@
 "use client";
 
-import { getUsers, createTransaction } from "@/app/api/api";
+import { getUsers, createTransaction, GetTransactionsItemResponse, getTransaction } from "@/app/api/api";
 import { getToken, isAuthenticated } from "@/app/api/auth";
 import {
   Box,
@@ -19,11 +19,11 @@ import {
 import { useRouter } from "next/navigation";
 import { SyntheticEvent, useEffect, useState } from "react";
 
-export default function TransactionCreateForm(props: any) {
-  const { clone } = props;
+export default function TransactionCreateForm(props: { searchParams: { duplicate: string }}) {
+  const { duplicate: duplicateId } = props.searchParams;
 
-  const [amount, setAmount] = useState(clone ? clone.amount : "");
-  const [recipient, setRecipient] = useState(clone ? clone.recipientId : "");
+  const [amount, setAmount] = useState("");
+  const [recipient, setRecipient] = useState(0);
   const [usersList, setUsersList] = useState(new Array());
   const router = useRouter();
 
@@ -36,16 +36,30 @@ export default function TransactionCreateForm(props: any) {
   useEffect(() => {
     async function fetchData() {
       const req = await getUsers(token);
+      let transaction = null;
       if (req.success && req.data) {
         const list = req.data.users.map(({ id, name }) => {
           return { label: name, id };
         });
+
+        if (duplicateId) {
+          const transactionReq = await getTransaction(token, duplicateId);
+          if (transactionReq.success && transactionReq.data) {
+            transaction = transactionReq.data;
+          }
+        }
+
+        if (transaction) {
+          setAmount(transaction.amount);
+          setRecipient(transaction.recipientId);
+        }
+        
         setUsersList(list);
       }
     }
 
     fetchData();
-  }, [JSON.stringify(usersList)]);
+  }, [JSON.stringify(usersList), amount, recipient]);
 
   const handleSubmit = async (event: SyntheticEvent) => {
     event.preventDefault();
@@ -75,7 +89,7 @@ export default function TransactionCreateForm(props: any) {
         >
           <form onSubmit={handleSubmit}>
             <List>
-              <Button variant="contained" href="/profile">
+              <Button variant="contained" onClick={() => { router.back()}}>
                 Back
               </Button>
               <ListItem>
@@ -89,6 +103,10 @@ export default function TransactionCreateForm(props: any) {
                   renderInput={(params) => (
                     <TextField {...params} label="Recipient" />
                   )}
+                  value={
+                    (duplicateId && usersList.length)? usersList.filter(it => it.id === recipient)[0]: { label: ""}
+                  }
+                  sx={{ width: 300 }}
                 />
               </ListItem>
               <ListItem>
@@ -99,6 +117,7 @@ export default function TransactionCreateForm(props: any) {
                   variant="filled"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
+                  sx={{ width: 300 }}
                 />
               </ListItem>
               <Button variant="contained" type="submit">
