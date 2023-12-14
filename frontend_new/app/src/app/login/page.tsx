@@ -17,15 +17,21 @@ import {
 import { SyntheticEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { login } from "../api/api";
-import { saveToken } from "../api/auth";
+import { isAuthenticated, saveToken } from "../api/auth";
 import { validatePassword, validateEmail } from "../api/validators";
+import { APP_ROUTES } from "@/constants";
 
 export default function Login() {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
+  const [serverError, setServerError] = useState("");
   const router = useRouter();
+
+  if (isAuthenticated()) {
+    router.push(APP_ROUTES.PROFILE);
+  }
 
   const validateForm = () => {
     const emailResult = validateEmail(email);
@@ -46,11 +52,16 @@ export default function Login() {
       const res = await login({ email, password });
       if (res.success && res.data) {
         saveToken(res.data);
-        router.push("/profile");
+        router.push(APP_ROUTES.PROFILE);
+      } else if (res.error) {
+        throw new Error(res.error.message);
       }
-    } catch (e) {
-      console.log(e);
-    } finally {
+    } catch (error) {
+      if (error instanceof Error) {
+        setServerError(error.message);
+      } else {
+        console.log(error);
+      }
     }
   };
 
@@ -97,14 +108,14 @@ export default function Login() {
               <Button variant="contained" type="submit">
                 Login
               </Button>
-              <Button variant="contained" href="/register">
+              <Button variant="contained" href={APP_ROUTES.REGISTER}>
                 Sign up
               </Button>
             </List>
           </form>
           { emailError? <Alert severity="error" >Email should be email</Alert>: null}
           { passwordError? <Alert severity="error" >Password is too short</Alert>: null}
-            
+          { serverError? <Alert severity="error">{serverError}</Alert>: null}
         </Paper>
       </Container>
     </Box>

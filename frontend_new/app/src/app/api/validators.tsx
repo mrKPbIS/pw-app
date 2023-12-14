@@ -13,3 +13,22 @@ export const validateEmail = (value: string): boolean => {
 export const validateConfirmPassword = (password: string, confirmPassword: string): boolean => {
   return password !== confirmPassword;
 }
+
+interface validateNumberStringOptions {
+  min?: number;
+  decimalDigits?: number;
+}
+
+export const validateNumberString = (value: string, options: validateNumberStringOptions): boolean => {
+  let res = true;
+  const valueToNumber = Number(value);
+  res = res && typeof value === 'string' && valueToNumber !== Number.NaN;
+  if (options.hasOwnProperty('min') && options.min !== undefined) {
+    res = res && valueToNumber > options.min;
+  }
+  if (options.hasOwnProperty('decimalDigits') && options.decimalDigits !== undefined) {
+    const [whole, decimal] = value.split('.');
+    res = res && decimal.length === options.decimalDigits;
+  }
+  return !res;
+}

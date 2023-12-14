@@ -16,15 +16,24 @@ import {
   Link,
 } from "@mui/material";
 import ReplayIcon from '@mui/icons-material/Replay';
-import { useState, useEffect } from "react";
+import { useState, useEffect, SyntheticEvent } from "react";
 import { getTransactions, GetTransactionsItemResponse } from "../api/api";
-import { getToken, getUser } from "../api/auth";
+import { getToken, getUser, logout } from "../api/auth";
+import { useRouter } from "next/navigation";
+import { APP_ROUTES } from "@/constants";
 
 export default function TransactionsList() {
   const [data, setData] = useState({ transactions: new Array(), count: 0 });
   const { transactions, count } = data;
+  const router = useRouter();
 
   const token = getToken();
+
+  const logoutHandler = (e: SyntheticEvent) => {
+    e.preventDefault();
+    logout();
+    router.push(APP_ROUTES.LOGIN);
+  };
 
   useEffect(() => {
     async function fetchData() {
@@ -37,7 +46,7 @@ export default function TransactionsList() {
     }
 
     fetchData();
-  }, []);
+  }, [token]);
 
   const pages = count ? Math.ceil(count / transactions.length) : 0;
   return (
@@ -47,7 +56,7 @@ export default function TransactionsList() {
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             PW app
           </Typography>
-          <Button color="inherit">Logout</Button>
+          <Button color="inherit" onClick={logoutHandler}>Logout</Button>
         </Toolbar>
       </AppBar>
       <Container component="main" maxWidth="sm" sx={{ mb: 4 }}>
@@ -55,7 +64,7 @@ export default function TransactionsList() {
           variant="outlined"
           sx={{ my: { xs: 3, md: 6 }, p: { xs: 2, md: 3 } }}
         >
-          <Button variant="contained" href="/profile">
+          <Button variant="contained" href={APP_ROUTES.PROFILE}>
             Back
           </Button>
           <List>
@@ -85,7 +94,7 @@ function TransactionsItem(props: { transaction: GetTransactionsItemResponse }) {
       <ListItem>
         <ListItemText primary={recipient.name} secondary="Transferred to" />
         <ListItemIcon >
-          <Link href={`/transactions/create?duplicate=${id}`}>
+          <Link href={`${APP_ROUTES.TRANSACTIONS}/create?duplicate=${id}`}>
             <ReplayIcon />
           </Link>
         </ListItemIcon>

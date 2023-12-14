@@ -17,8 +17,9 @@ import {
 import { SyntheticEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { register } from "../api/api";
-import { saveToken } from "../api/auth";
+import { isAuthenticated, saveToken } from "../api/auth";
 import { validateConfirmPassword, validateEmail, validateString, validatePassword } from "../api/validators";
+import { APP_ROUTES } from "@/constants";
 
 export default function Register() {
   const [name, setName] = useState("");
@@ -29,7 +30,12 @@ export default function Register() {
   const [emailError, setEmailError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
   const [confirmPasswordError, setConfirmPasswordError] = useState(false);
+  const [serverError, setServerError] = useState("");
   const router = useRouter();
+
+  if (isAuthenticated()) {
+    router.push(APP_ROUTES.PROFILE);
+  }
 
   const validateForm = () => {
     const nameResult = validateString(name);
@@ -54,10 +60,16 @@ export default function Register() {
       const res = await register({ email, name, password });
       if (res.success && res.data) {
         saveToken(res.data);
-        router.push("/profile");
+        router.push(APP_ROUTES.PROFILE);
+      } else if (res.error) {
+        throw new Error(res.error.message);
       }
-    } catch (e) {
-      console.log(e);
+    } catch (error) {
+      if (error instanceof Error) {
+        setServerError(error.message);
+      } else {
+        console.log(error);
+      }
     }
   };
 
@@ -127,7 +139,7 @@ export default function Register() {
               <Button variant="contained" type="submit">
                 Register
               </Button>
-              <Button variant="contained" href="/login">
+              <Button variant="contained" href={APP_ROUTES.LOGIN}>
                 Back
               </Button>
             </List>
@@ -136,6 +148,7 @@ export default function Register() {
           { emailError? <Alert severity="error" >Email should be email</Alert>: null}
           { passwordError? <Alert severity="error" >Password is too short</Alert>: null}
           { confirmPasswordError? <Alert severity="error" >Passwords don&apos;t match</Alert>: null}
+          { serverError? <Alert severity="error">{serverError}</Alert>: null}
         </Paper>
       </Container>
     </Box>
