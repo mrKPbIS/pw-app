@@ -16,7 +16,7 @@ export const saveToken = (token: string) => {
 export const getToken = (): string => {
   const token = localStorage.getItem("auth-token");
   if (typeof token !== "string") {
-    throw new Error("no token");
+    throw new Error("no token in storage");
   }
   return token;
 };

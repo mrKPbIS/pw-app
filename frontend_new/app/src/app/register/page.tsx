@@ -16,9 +16,9 @@ import {
 } from "@mui/material";
 import { SyntheticEvent, useState } from "react";
 import { useRouter } from "next/navigation";
-import { register } from "../api/api";
-import { isAuthenticated, saveToken } from "../api/auth";
-import { validateConfirmPassword, validateEmail, validateString, validatePassword } from "../api/validators";
+import { register } from "../utils/api";
+import { isAuthenticated, saveToken } from "../utils/auth";
+import { validateConfirmPassword, validateEmail, validateString, validatePassword } from "../utils/validators";
 import { APP_ROUTES } from "@/constants";
 
 export default function Register() {

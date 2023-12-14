@@ -1,8 +1,8 @@
 "use client";
 
-import { getUsers, createTransaction, GetTransactionsItemResponse, getTransaction } from "@/app/api/api";
-import { getToken, isAuthenticated, logout } from "@/app/api/auth";
-import { validateNumberString } from "@/app/api/validators";
+import { getUsers, createTransaction, getTransaction } from "@/app/utils/api";
+import { getToken, isAuthenticated, logout } from "@/app/utils/auth";
+import { validateNumberString } from "@/app/utils/validators";
 import { APP_ROUTES } from "@/constants";
 import {
   Box,

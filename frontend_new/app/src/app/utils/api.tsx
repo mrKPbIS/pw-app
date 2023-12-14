@@ -125,13 +125,21 @@ export async function getUsers(token: string) {
   return res;
 }
 
-export async function getTransactions(token: string) {
+export async function getTransactions(token: string, offset?: number, limit?: number) {
   const headers = {
     ...credentialsHeaders(token),
     "ngrok-skip-browser-warning": "true",
   };
+  const searchParams = [];
+  if (offset) {
+    searchParams.push({ key: 'offset', value: offset });
+  }
+  if (limit) {
+    searchParams.push({ key: 'limit', value: limit });
+  }
+
   const res = await request<GetTransactionsResponse>(
-    `${API_BASE_URL}${API_TRANSACTIONS_PATH}`,
+    `${API_BASE_URL}${API_TRANSACTIONS_PATH}${searchParams.length? '?': ""}${searchParams.map(({ key, value }) => `${key}=${value}`).join('&')}`,
     "GET",
     headers,
     null,

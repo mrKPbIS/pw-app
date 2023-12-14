@@ -16,8 +16,8 @@ import {
 } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { SyntheticEvent, useEffect, useState } from "react";
-import { getProfile } from "../api/api";
-import { getToken, getUser, isAuthenticated, logout } from "../api/auth";
+import { getProfile } from "../utils/api";
+import { getToken, getUser, isAuthenticated, logout } from "../utils/auth";
 
 export default function Profile() {
   const [data, setData] = useState({ name: "", email: "", balance: "" });
