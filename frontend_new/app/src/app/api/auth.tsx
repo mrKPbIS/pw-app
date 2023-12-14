@@ -22,7 +22,7 @@ export const getToken = (): string => {
 };
 
 export const isAuthenticated = () => {
-  const token = getToken();
+  const token = localStorage.getItem("auth-token");
   return token !== null;
 };
 
