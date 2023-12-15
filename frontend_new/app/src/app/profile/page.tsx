@@ -2,17 +2,11 @@
 
 import { APP_ROUTES } from "@/constants";
 import {
-  Box,
-  Button,
   Container,
   List,
   ListItemText,
   ListItemButton,
-  AppBar,
-  Typography,
   Paper,
-  Toolbar,
-  CircularProgress,
 } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { SyntheticEvent, useEffect, useState } from "react";
@@ -44,7 +38,7 @@ export default function Profile() {
         if (res.success && res.data) {
           setData(res.data);
           setLoading(false);
-        } else  if (res.error) {
+        } else if (res.error) {
           throw new Error(res.error.message);
         }
       } catch (e) {
@@ -56,38 +50,25 @@ export default function Profile() {
   }, [token, userId]);
 
   return (
-    <Box>
-      <AppBar position="static">
-        <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            PW app
-          </Typography>
-          <Button color="inherit" onClick={logoutHandler}>
-            Logout
-          </Button>
-        </Toolbar>
-      </AppBar>
-      <Container component="main" maxWidth="sm" sx={{ mb: 4 }}>
-        <Paper
-          variant="outlined"
-          sx={{ my: { xs: 3, md: 6 }, p: { xs: 2, md: 3 } }}
-        >
-          { isLoading 
-            ?<CircularProgress /> 
-            :<List>
-              <ListItemText primary={data.name} secondary="Name" />
-              <ListItemText primary={data.email} secondary="Email" />
-              <ListItemText primary={data.balance} secondary="Balance" />
-              <ListItemButton href={`${APP_ROUTES.TRANSACTIONS}/create`}>
-                <ListItemText primary="New transaction" />
-              </ListItemButton>
-              <ListItemButton href={APP_ROUTES.TRANSACTIONS}>
-                <ListItemText primary="Transactions history" />
-              </ListItemButton>
-            </List>
-          }
-        </Paper>
-      </Container>
-    </Box>
+    <Container component="main" maxWidth="sm" sx={{ mb: 4 }}>
+      <Paper
+        variant="outlined"
+        sx={{ my: { xs: 3, md: 6 }, p: { xs: 2, md: 3 } }}
+      >
+        {/* { isLoading 
+            ?<CircularProgress />   */}
+        <List>
+          <ListItemText primary={data.name} secondary="Name" />
+          <ListItemText primary={data.email} secondary="Email" />
+          <ListItemText primary={data.balance} secondary="Balance" />
+          <ListItemButton href={`${APP_ROUTES.TRANSACTIONS}/create`}>
+            <ListItemText primary="New transaction" />
+          </ListItemButton>
+          <ListItemButton href={APP_ROUTES.TRANSACTIONS}>
+            <ListItemText primary="Transactions history" />
+          </ListItemButton>
+        </List>
+      </Paper>
+    </Container>
   );
 }
