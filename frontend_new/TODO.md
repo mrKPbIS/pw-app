@@ -1,7 +1,7 @@
 Pages
 
 Log in screen with registration +
-- add data validation
+- add data validation +
 
 Profile screen
 Shows Name and current balance +
@@ -11,8 +11,17 @@ routes:
 - logout +
   
 Create transaction form +
-- add data validation
+- add data validation +
+- filter autocomplete
 
 Transactions list +
   - add filters 
-  - transactions duplication
+  - transactions duplication +
+  - pagination +
+
+Common
+- Show request errors +
+- Add sockets
+- Remove duplicated layout +
+
+!!! Fix Logout button lagging
