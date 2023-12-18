@@ -12,6 +12,7 @@ routes:
   
 Create transaction form +
 - add data validation +
+- controlled component +  
 - filter autocomplete
 
 Transactions list +

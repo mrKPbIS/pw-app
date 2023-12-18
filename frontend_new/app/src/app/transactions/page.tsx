@@ -11,6 +11,7 @@ import {
   Pagination,
   ListItemIcon,
   Link,
+  CircularProgress,
 } from "@mui/material";
 import ReplayIcon from "@mui/icons-material/Replay";
 import { useState, useEffect, SyntheticEvent } from "react";
@@ -24,28 +25,28 @@ const PAGE_LIMIT = 10;
 export default function TransactionsList() {
   const [data, setData] = useState({ transactions: new Array(), count: 0 });
   const [page, setPage] = useState(1);
+  const [isLoading, setLoading] = useState(false);
   const { transactions, count } = data;
-  const router = useRouter();
-
   const token = getToken();
-
-  const logoutHandler = (e: SyntheticEvent) => {
-    e.preventDefault();
-    logout();
-    router.push(APP_ROUTES.LOGIN);
-  };
 
   useEffect(() => {
     async function fetchData() {
-      const res = await getTransactions(
-        token,
-        (page - 1) * PAGE_LIMIT,
-        PAGE_LIMIT,
-      );
-      if (res.success && res.data) {
-        setData(res.data);
-      } else {
-        console.log(res.error);
+      try {
+        setLoading(true);
+        const res = await getTransactions(
+          token,
+          (page - 1) * PAGE_LIMIT,
+          PAGE_LIMIT,
+        );
+        if (res.success && res.data) {
+          setData(res.data);
+        } else {
+          console.log(res.error);
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
       }
     }
 
@@ -66,8 +67,11 @@ export default function TransactionsList() {
         <Button variant="contained" href={APP_ROUTES.PROFILE}>
           Back
         </Button>
+
         <List>
-          {transactions.length ? (
+          {isLoading ? (
+            <CircularProgress />
+          ) : transactions.length ? (
             transactions.map((item) => {
               return <TransactionsItem key={item.id} transaction={item} />;
             })
