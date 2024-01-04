@@ -5,6 +5,7 @@ import { Box } from "@mui/material";
 export default function RootLayout(props: {
   children: React.ReactNode;
   toolbar: React.ReactNode;
+  notifications: React.ReactNode;
 }) {
   return (
     <html lang="en">
@@ -12,6 +13,7 @@ export default function RootLayout(props: {
         <Box>
           {props.toolbar}
           {props.children}
+          {props.notifications}
         </Box>
       </body>
     </html>

@@ -17,17 +17,21 @@ import { getToken, getUser, isAuthenticated } from "../utils/auth";
 export default function Profile() {
   const [data, setData] = useState({ name: "", email: "", balance: "" });
   const [isLoading, setLoading] = useState(false);
-  const { id: userId } = getUser();
-  const token = getToken();
   const router = useRouter();
-
-  if (!isAuthenticated()) {
-    router.push(APP_ROUTES.LOGIN);
-  }
 
   useEffect(() => {
     async function fetchData() {
       try {
+        let token = "";
+        let userId = 0;
+        if (localStorage) {
+          if (!isAuthenticated()) {
+            router.push(APP_ROUTES.LOGIN);
+          } else {
+            token = getToken();
+            userId = getUser().id;
+          }
+        }
         setLoading(true);
         const res = await getProfile(token, userId);
         if (res.success && res.data) {
@@ -42,7 +46,7 @@ export default function Profile() {
       }
     }
     fetchData();
-  }, [token, userId]);
+  }, [router]);
 
   return (
     <Container component="main" maxWidth="sm" sx={{ mb: 4 }}>

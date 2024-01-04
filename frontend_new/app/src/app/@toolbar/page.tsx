@@ -3,13 +3,16 @@
 import { APP_ROUTES } from "@/constants";
 import { AppBar, Typography, Button, Toolbar } from "@mui/material";
 import { useRouter } from "next/navigation";
-import { SyntheticEvent } from "react";
+import { SyntheticEvent, useEffect, useState } from "react";
 import { isAuthenticated, logout } from "../utils/auth";
 
 export default function AppToolbar() {
-  const isAuth = isAuthenticated();
+  let [isAuth, setIsAuth] = useState(false);
   const router = useRouter();
-  console.log("toolbar render", isAuth);
+
+  useEffect(() => {
+    setIsAuth(isAuthenticated());
+  }, []);
 
   const logoutHandler = (e: SyntheticEvent) => {
     e.preventDefault();
