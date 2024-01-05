@@ -3,7 +3,7 @@
 import { Snackbar } from "@mui/base";
 import { Alert } from "@mui/material";
 import { useEffect, useState } from "react";
-import { getUser } from "../utils/auth";
+import { getUser, isAuthenticated } from "../utils/auth";
 import { socket } from "../utils/socket";
 
 export default function Notifications() {
@@ -12,7 +12,10 @@ export default function Notifications() {
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    const { id: userId } = getUser();
+    let userId: number | null = null;
+    if (isAuthenticated()) {
+      userId = getUser().id;
+    }
 
     function onConnect() {
       setIsConnected(true);
