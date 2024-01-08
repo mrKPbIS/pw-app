@@ -22,7 +22,7 @@ Transactions list +
 
 Common
 - Show request errors +
-- Add sockets
+- Add sockets +
 - Remove duplicated layout +
 
 !!! Fix Logout button lagging
